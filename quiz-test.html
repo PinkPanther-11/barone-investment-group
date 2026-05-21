@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz Test — Barone Investment Group</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #050505; color: #fff; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .shell { width: 100%; max-width: 680px; background: #111; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 36px; }
+  h2 { font-size: 1.5rem; margin: 0 0 8px; }
+  p  { color: #aaa; margin: 0 0 20px; }
+  .bar-wrap { margin-bottom: 28px; }
+  .bar-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 6px; margin-top: 6px; }
+  .bar-fill  { height: 6px; background: #d7b56d; border-radius: 6px; transition: width 0.3s; }
+  .label     { font-size: 0.78rem; color: #888; letter-spacing: 0.08em; text-transform: uppercase; }
+  .options   { display: grid; gap: 10px; margin-top: 22px; }
+  .options button { text-align: left; padding: 16px 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.13); border-radius: 12px; color: #fff; cursor: pointer; font-size: 0.97rem; transition: border-color 0.15s, background 0.15s; }
+  .options button:hover { border-color: #d7b56d; background: rgba(215,181,109,0.08); }
+  .start-btn, .retake-btn { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg,#f2d990,#d7b56d); color: #080808; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 12px; }
+  .retake-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); margin-left: 10px; }
+  .result { display: none; }
+  .badge  { font-size: 3.5rem; margin-bottom: 8px; }
+  .tagline { color: #d7b56d; font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 6px; }
+  .type-name { font-size: 1.8rem; font-weight: 700; margin: 0 0 14px; }
+  .desc { color: #bbb; line-height: 1.65; margin-bottom: 22px; }
+  .recs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .recs h4 { color: #d7b56d; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 10px; }
+  .recs ul  { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .recs li a { color: #f2d990; text-decoration: none; font-size: 0.92rem; }
+  .recs li a:hover { text-decoration: underline; }
+  .actions { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .goto-btn { display: inline-block; padding: 14px 24px; background: linear-gradient(135deg,#f2d990,#d7b56d); color: #080808; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; }
+  .disc { font-size: 0.72rem; color: #666; margin-top: 14px; }
+  @media(max-width:540px){ .recs{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div class="shell" id="shell">
+
+  <!-- START -->
+  <div id="q-start">
+    <p class="label">Find your money type</p>
+    <h2>What kind of financial person are you?</h2>
+    <p>8 quick questions. Instant result. Personalized chapter and tool recommendations — no login required.</p>
+    <p class="disc">Educational only — not financial advice.</p>
+    <button class="start-btn" id="start-btn">Start the quiz →</button>
+  </div>
+
+  <!-- QUESTION -->
+  <div id="q-question" style="display:none">
+    <div class="bar-wrap">
+      <span class="label" id="q-label">Question 1 of 8</span>
+      <div class="bar-track"><div class="bar-fill" id="q-bar" style="width:0%"></div></div>
+    </div>
+    <h2 id="q-text"></h2>
+    <div class="options" id="q-options"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="q-result" style="display:none">
+    <div class="badge"  id="r-emoji"></div>
+    <p class="tagline"  id="r-tagline"></p>
+    <p class="type-name" id="r-name"></p>
+    <p class="desc"     id="r-desc"></p>
+    <div class="recs">
+      <div>
+        <h4>Recommended chapters</h4>
+        <ul id="r-chapters"></ul>
+      </div>
+      <div>
+        <h4>Recommended tools</h4>
+        <ul id="r-tools"></ul>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="goto-btn" href="index.html#chapters">Start my plan →</a>
+      <button class="retake-btn" id="retake-btn">Retake quiz</button>
+    </div>
+    <p class="disc">For educational purposes only. Not personalized financial advice.</p>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var elStart    = document.getElementById('q-start');
+  var elQuestion = document.getElementById('q-question');
+  var elResult   = document.getElementById('q-result');
+  var elLabel    = document.getElementById('q-label');
+  var elBar      = document.getElementById('q-bar');
+  var elText     = document.getElementById('q-text');
+  var elOptions  = document.getElementById('q-options');
+
+  var questions = [
+    { text: 'When you get paid, what usually happens first?', options: [
+      { label: 'I split it between bills, savings, and a budget right away', w: {saver:3} },
+      { label: 'I cover my bills and enjoy whatever is left', w: {spender:3} },
+      { label: 'I move money to investments before I spend anything else', w: {builder:2,optimizer:2} },
+      { label: 'Honestly, I just try to make it work each month', w: {catchup:2,avoider:1} }
+    ]},
+    { text: 'How honest are you about your bank balance right now?', options: [
+      { label: 'I know exactly — I check it daily and track everything', w: {saver:2,optimizer:2} },
+      { label: 'I know roughly, but I avoid looking too closely', w: {avoider:3,spender:1} },
+      { label: 'I check when something comes up or I need to decide', w: {spender:2} },
+      { label: 'I pay more attention to my investment accounts than my bank', w: {builder:3,optimizer:1} }
+    ]},
+    { text: 'An unexpected $500 drops into your account. You:', options: [
+      { label: 'Move it straight to savings or my emergency fund', w: {saver:3} },
+      { label: 'Spend it on something I have been wanting — I earned it', w: {spender:3} },
+      { label: 'Invest it — probably index fund shares', w: {builder:2,optimizer:2} },
+      { label: 'Use it to pay off a bill or debt I have been carrying', w: {catchup:3} }
+    ]},
+    { text: 'Pick the statement that feels most true for you right now:', options: [
+      { label: 'I save consistently but my money feels like it is not growing', w: {saver:3} },
+      { label: 'I spend more than I should and feel guilty about it every month', w: {spender:3} },
+      { label: 'Money gives me real anxiety — I tend to avoid dealing with it', w: {avoider:3} },
+      { label: 'I track every dollar and want to squeeze every percent of return', w: {optimizer:3} }
+    ]},
+    { text: 'What is your honest relationship with debt right now?', options: [
+      { label: 'Minimal — I hate carrying a balance and pay it off fast', w: {saver:2,optimizer:1} },
+      { label: 'I have some — mostly making minimum payments', w: {spender:2,avoider:1} },
+      { label: 'I use debt strategically only when the math makes sense', w: {builder:2,optimizer:2} },
+      { label: 'I have debt I am genuinely not sure how to tackle', w: {catchup:3} }
+    ]},
+    { text: 'When you think about investing right now:', options: [
+      { label: 'I have savings but have not actually started investing yet', w: {saver:3} },
+      { label: 'I have thought about it a lot but something keeps stopping me', w: {avoider:2,spender:1} },
+      { label: 'I am already in the market and always learning new strategies', w: {builder:2,optimizer:2} },
+      { label: 'Investing feels like a future thing — I need stability first', w: {catchup:2,avoider:1} }
+    ]},
+    { text: 'How do you make spending decisions?', options: [
+      { label: 'I have a budget with real category limits and I follow it', w: {saver:2,optimizer:1} },
+      { label: 'I go with how I feel — if I want it and can pay, I get it', w: {spender:3} },
+      { label: 'I research obsessively before buying anything significant', w: {optimizer:3} },
+      { label: 'I avoid spending wherever I can because I feel behind', w: {catchup:2,avoider:1} }
+    ]},
+    { text: 'Your #1 financial goal for the next 12 months?', options: [
+      { label: 'Build up (or protect) my savings and emergency fund', w: {saver:3} },
+      { label: 'Actually stick to a spending plan and stop the leaks', w: {spender:2,avoider:1} },
+      { label: 'Grow my investment portfolio and maximize long-term returns', w: {builder:2,optimizer:2} },
+      { label: 'Pay off debt and stop living month to month', w: {catchup:3} }
+    ]}
+  ];
+
+  var results = {
+    saver:     { emoji:'🏦', name:'The Safe Keeper',      tagline:'You save well — now make it grow.',                    desc:'You are disciplined and consistent — genuinely strong traits. But savings sitting in a low-yield account loses ground to inflation every year. Your next step is putting those dollars to work through investing.', chapters:[['investing','Investing Basics'],['budgeting','Budgeting Without Feeling Broke'],['ai','AI for Personal Finance']], tools:[['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['savings','Savings Goal Tracker']] },
+    spender:   { emoji:'💳', name:'The Lifestyle Builder', tagline:'Great at enjoying money — build a system for it.',      desc:'You know how to live well, but without a system, lifestyle creep quietly wins every month. A real budget does not restrict you — it makes your spending intentional so you can enjoy it without the guilt.', chapters:[['budgeting','Budgeting Without Feeling Broke'],['reset','Money Reset'],['credit','Credit Score Basics']], tools:[['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['debt_planner','Debt Payoff Planner']] },
+    builder:   { emoji:'📈', name:'The Long-Game Player',  tagline:'You think in decades. That is your biggest edge.',      desc:'You already have the mindset that separates wealth builders from everyone else. Now it is about optimizing your strategy, growing income, and letting compounding do the heavy lifting over time.', chapters:[['investing','Investing Basics'],['careers','Career and Income Growth'],['ai','AI for Personal Finance']], tools:[['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['email_gen','Career Email Generator']] },
+    avoider:   { emoji:'🌱', name:'The Stress Avoider',    tagline:'Money anxiety is real — and totally workable.',         desc:'Avoiding money topics is a stress response, not a character flaw. The goal is not perfection — it is one small step at a time. Start with the simplest chapter and build from there. Things get manageable faster than you think.', chapters:[['reset','Money Reset'],['budgeting','Budgeting Without Feeling Broke'],['credit','Credit Score Basics']], tools:[['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['credit_score','Credit Score Guide']] },
+    optimizer: { emoji:'⚡', name:'The Optimizer',         tagline:'The basics are handled — time for advanced moves.',    desc:'You track, analyze, and want to maximize every dollar — that is genuinely rare. The fundamentals are solid. Your edge is in fine-tuning: tax strategy, portfolio allocation, AI finance tools, and income acceleration.', chapters:[['investing','Investing Basics'],['ai','AI for Personal Finance'],['careers','Career and Income Growth']], tools:[['compound','Compound Interest Calculator'],['tax','Tax Estimator'],['invest_guide','Investing Learning Path']] },
+    catchup:   { emoji:'🚀', name:'The Comeback Kid',      tagline:'Starting over or starting late — here is your roadmap.', desc:'You are dealing with real financial pressure, not just theory. The goal right now is not perfection — it is stopping the bleeding, building a base, and stacking small wins that snowball. You are not behind forever. You are just starting.', chapters:[['reset','Money Reset'],['debt_payoff','Debt Payoff Strategy'],['budgeting','Budgeting Without Feeling Broke']], tools:[['debt_planner','Debt Payoff Planner'],['emergency','Emergency Fund Calculator'],['budget','Budget Builder']] }
+  };
+
+  var scores   = {saver:0, spender:0, builder:0, avoider:0, optimizer:0, catchup:0};
+  var currentQ = 0;
+
+  function show(el)  { el.style.display = ''; }
+  function hide(el)  { el.style.display = 'none'; }
+
+  function renderQuestion(idx) {
+    var q = questions[idx];
+    elLabel.textContent = 'Question ' + (idx + 1) + ' of ' + questions.length;
+    elBar.style.width   = ((idx / questions.length) * 100).toFixed(0) + '%';
+    elText.textContent  = q.text;
+    elOptions.innerHTML = '';
+    q.options.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.textContent = opt.label;
+      btn.addEventListener('click', function () {
+        Object.keys(opt.w).forEach(function (k) { scores[k] += opt.w[k]; });
+        currentQ++;
+        if (currentQ < questions.length) {
+          renderQuestion(currentQ);
+        } else {
+          renderResult();
+        }
+      });
+      elOptions.appendChild(btn);
+    });
+  }
+
+  function renderResult() {
+    elBar.style.width      = '100%';
+    elLabel.textContent    = 'Complete!';
+    var winner = Object.keys(scores).reduce(function (a, b) { return scores[a] >= scores[b] ? a : b; });
+    var r = results[winner];
+    document.getElementById('r-emoji').textContent   = r.emoji;
+    document.getElementById('r-tagline').textContent = r.tagline;
+    document.getElementById('r-name').textContent    = r.name;
+    document.getElementById('r-desc').textContent    = r.desc;
+    document.getElementById('r-chapters').innerHTML  = r.chapters.map(function (c) { return '<li><a href="lesson.html?topic=' + c[0] + '">' + c[1] + '</a></li>'; }).join('');
+    document.getElementById('r-tools').innerHTML     = r.tools.map(function (t) { return '<li><a href="tool.html?tool=' + t[0] + '">' + t[1] + '</a></li>'; }).join('');
+
+    // Save profile to localStorage so main site can use it
+    try { localStorage.setItem('bigProfile', JSON.stringify({ type: winner, name: r.name, emoji: r.emoji, tagline: r.tagline })); } catch(e) {}
+
+    hide(elQuestion);
+    show(elResult);
+  }
+
+  function resetQuiz() {
+    Object.keys(scores).forEach(function (k) { scores[k] = 0; });
+    currentQ = 0;
+    hide(elResult);
+    show(elQuestion);
+    renderQuestion(0);
+  }
+
+  document.getElementById('start-btn').addEventListener('click', function () {
+    hide(elStart);
+    show(elQuestion);
+    renderQuestion(0);
+  });
+
+  document.getElementById('retake-btn').addEventListener('click', resetQuiz);
+
+}());
+</script>
+
+</body>
+</html>

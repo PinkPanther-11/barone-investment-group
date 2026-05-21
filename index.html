@@ -3,406 +3,728 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Barone Investment Group | AI-Powered Financial Education for Gen Z</title>
-    <meta
-      name="description"
-      content="Barone Investment Group helps Gen Z use AI and practical financial education to budget better, invest smarter, build credit, and create career opportunities."
-    />
-    <link rel="stylesheet" href="styles.css?v=20260520c" />
+    <title>Barone Investment Group | AI Finance Education for Gen Z</title>
+    <meta name="description" content="Practical AI finance workflows, interactive chapters, and smart tools for Gen Z students and young professionals. Built by Ryan Barone." />
+
+    <!-- Open Graph / social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://baroneinvestmentgroup.site/" />
+    <meta property="og:title" content="Barone Investment Group | AI Finance Education for Gen Z" />
+    <meta property="og:description" content="Practical AI finance workflows, interactive chapters, and smart tools for Gen Z students and young professionals." />
+    <meta property="og:image" content="https://baroneinvestmentgroup.site/og-image.png" />
+
+    <!-- Twitter / X card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Barone Investment Group | AI Finance Education for Gen Z" />
+    <meta name="twitter:description" content="Practical AI finance workflows, interactive chapters, and smart tools for Gen Z students and young professionals." />
+    <meta name="twitter:image" content="https://baroneinvestmentgroup.site/og-image.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="styles.css?v=20260522" />
   </head>
   <body>
+
+    <!-- Full-page animated background canvas (fixed, behind everything) -->
+    <canvas id="page-bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- Slow-moving gradient orbs (CSS-driven, gold + blue) -->
     <div class="ambient-bg" aria-hidden="true">
       <span></span>
       <span></span>
       <span></span>
+      <span class="orb-blue"></span>
+      <span class="orb-blue"></span>
     </div>
 
+    <!-- ── Header ─────────────────────────────────────────────────────────── -->
     <header class="site-header" data-header>
       <a class="brand" href="#top" aria-label="Barone Investment Group home">
-        <span class="brand-mark">B</span>
+        <span class="brand-mark"><span class="bm-letter">B</span></span>
         <span>
-          <strong>Barone</strong>
+          <strong class="bm-wordmark">Barone</strong>
           <small>Investment Group</small>
         </span>
       </a>
 
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </button>
 
       <nav id="site-nav" class="site-nav" data-nav>
-        <a href="#mission">Mission</a>
+        <a href="#quiz">Quiz</a>
+        <a href="#chapters">Chapters</a>
+        <a href="#playbooks">Playbooks</a>
         <a href="#tools">Tools</a>
-        <a href="#education">Education</a>
-        <a href="#workflows">AI Workflows</a>
-        <a href="#automation">Automation</a>
-        <a href="#founder">Founder</a>
+        <a href="#mission">About</a>
         <a href="#newsletter">Newsletter</a>
       </nav>
     </header>
 
     <main id="top">
+
+      <!-- ── 1. Hero ──────────────────────────────────────────────────────── -->
       <section class="hero section" id="home">
         <div class="hero-copy reveal">
-          <p class="eyebrow">Finance education for the AI generation</p>
-          <h1>AI-Powered Financial Education for Gen Z</h1>
-          <p>
-            Learn how to use AI to budget better, invest smarter, build credit, and create more career
-            opportunities.
-          </p>
+          <p class="eyebrow">AI finance education for Gen Z</p>
+          <h1>Build better money habits with AI.</h1>
+          <p>Practical tools, interactive chapters, and AI-powered workflows for students and young professionals who want to understand money — without the jargon.</p>
           <div class="hero-actions">
-            <a class="button primary" href="#tools">Explore Tools</a>
-            <a class="button secondary" href="#education">Start Learning</a>
+            <a class="button primary" href="#quiz">Find My Money Type</a>
+            <a class="button secondary" href="#chapters">Explore Chapters</a>
           </div>
-          <div class="hero-mini-grid" aria-label="Popular starting points">
-            <a href="lesson.html?topic=ai">AI money habits</a>
-            <a href="workflow.html?workflow=coding">Coding automations</a>
-            <a href="tool.html?tool=budget">Budget builder</a>
+          <a class="hero-tool-link" href="#tools">Or jump straight to the tools →</a>
+
+          <!-- Safety disclaimer -->
+          <p class="site-disclaimer">Educational content only — not financial, investment, legal, or tax advice. Do not paste private account numbers or sensitive personal data into any AI tool.</p>
+        </div>
+
+        <div class="hero-visual hero-calc-panel" aria-label="Compound growth calculator">
+          <div class="hero-calc">
+            <div class="hero-calc-top">
+              <p class="eyebrow" style="margin:0 0 6px">Compound Growth Calculator</p>
+              <p class="hero-calc-headline">If I invest <strong id="hero-save-display">$200</strong>/month…</p>
+              <div class="hero-slider-row">
+                <span class="slider-label">$50</span>
+                <input type="range" class="hero-slider" id="hero-save-slider" min="50" max="2000" step="50" value="200" aria-label="Monthly savings amount">
+                <span class="slider-label">$2,000</span>
+              </div>
+            </div>
+            <canvas id="hero-compound-canvas" aria-hidden="true"></canvas>
+            <div class="hero-calc-results">
+              <div class="hero-calc-result">
+                <span class="hcr-years">10 yrs</span>
+                <strong class="hcr-val" id="hcv-10">—</strong>
+                <span class="hcr-note">at 7% avg</span>
+              </div>
+              <div class="hero-calc-result hero-calc-result--mid">
+                <span class="hcr-years">20 yrs</span>
+                <strong class="hcr-val" id="hcv-20">—</strong>
+                <span class="hcr-note">at 7% avg</span>
+              </div>
+              <div class="hero-calc-result">
+                <span class="hcr-years">30 yrs</span>
+                <strong class="hcr-val" id="hcv-30">—</strong>
+                <span class="hcr-note">at 7% avg</span>
+              </div>
+            </div>
+            <p class="hero-calc-disclaimer">Illustrative only. Assumes consistent monthly contributions and a 7% annualized return. Past market performance does not guarantee future results. Not financial advice.</p>
           </div>
         </div>
-
-        <div class="hero-visual" aria-label="Animated finance and AI dashboard">
-          <canvas id="market-canvas" width="900" height="680"></canvas>
-          <article class="floating-card card-one">
-            <span>AI Budget Coach</span>
-            <strong>$420</strong>
-            <small>monthly savings target</small>
-          </article>
-          <article class="floating-card card-two">
-            <span>Credit Health</span>
-            <strong>18%</strong>
-            <small>utilization goal</small>
-          </article>
-          <article class="floating-card card-three">
-            <span>Career Signal</span>
-            <strong>3x</strong>
-            <small>resume improvements</small>
-          </article>
-        </div>
       </section>
 
-      <section class="stats-band" aria-label="Student impact metrics">
-        <div>
-          <strong data-counter data-target="6">0</strong>
-          <span>learning tracks</span>
-        </div>
-        <div>
-          <strong data-counter data-target="5">0</strong>
-          <span>AI workflows</span>
-        </div>
-        <div>
-          <strong data-counter data-target="6">0</strong>
-          <span>financial tools</span>
-        </div>
-        <div>
-          <strong data-counter data-target="0">0</strong>
-          <span>get-rich-quick promises</span>
-        </div>
-      </section>
-
-      <section class="section mission" id="mission">
+      <!-- ── 2. Money Type Quiz ───────────────────────────────────────────── -->
+      <section class="section quiz-section" id="quiz">
         <div class="section-head reveal">
-          <p class="eyebrow">Mission</p>
-          <h2>To help Gen Z use artificial intelligence and simple financial education to make smarter money decisions earlier in life.</h2>
-          <p>
-            Barone Investment Group turns intimidating money topics into practical lessons, calculators, and AI
-            workflows students can use before the stakes get high.
-          </p>
+          <p class="eyebrow">Find your money type</p>
+          <h2>What kind of financial person are you?</h2>
+          <p>6 quick questions. Instant result. Personalized chapter and tool recommendations — no login required.</p>
         </div>
-        <div class="mission-grid">
-          <article class="feature-card reveal">
-            <span>01</span>
-            <h3>Understand money earlier</h3>
-            <p>Learn the basics of budgeting, credit, investing, income, and tradeoffs before costly decisions.</p>
-          </article>
-          <article class="feature-card reveal">
-            <span>02</span>
-            <h3>Use AI responsibly</h3>
-            <p>Apply AI as a thinking partner for research, planning, drafts, and decision preparation.</p>
-          </article>
-          <article class="feature-card reveal">
-            <span>03</span>
-            <h3>Build real opportunity</h3>
-            <p>Connect personal finance skills with career growth, entrepreneurship, and long-term confidence.</p>
-          </article>
+
+        <div class="quiz-shell reveal" id="quiz-shell">
+
+          <!-- Start state -->
+          <div class="quiz-start" id="q-start">
+            <div class="quiz-start-inner">
+              <p class="quiz-start-copy">Answer honestly. There are no wrong answers — every result gives you a practical starting point.</p>
+              <p class="quiz-disclaimer-inline">Educational only — not financial advice.</p>
+              <button class="button primary" type="button" id="start-btn">Start the quiz →</button>
+            </div>
+          </div>
+
+          <!-- Question state -->
+          <div class="quiz-question-wrap" id="q-question" style="display:none">
+            <div class="quiz-progress-bar-wrap">
+              <span id="q-label" class="quiz-progress-label">Question 1 of 8</span>
+              <div class="quiz-bar"><div class="quiz-bar-fill" id="q-bar" style="width:0%"></div></div>
+            </div>
+            <h3 class="quiz-q-text" id="q-text"></h3>
+            <div class="quiz-options" id="q-options"></div>
+          </div>
+
+          <!-- Result state -->
+          <div class="quiz-result" id="q-result" style="display:none">
+            <div class="result-badge" id="r-emoji"></div>
+            <div class="result-body">
+              <p class="eyebrow" id="r-tagline">Your money type</p>
+              <h3 id="r-name"></h3>
+              <p id="r-desc"></p>
+              <div class="result-recs">
+                <div class="result-rec-col">
+                  <h4>Recommended chapters</h4>
+                  <ul id="r-chapters"></ul>
+                </div>
+                <div class="result-rec-col">
+                  <h4>Recommended tools</h4>
+                  <ul id="r-tools"></ul>
+                </div>
+              </div>
+              <div class="result-actions">
+                <a class="button primary" href="#chapters">Start my plan →</a>
+                <button class="button secondary" type="button" id="retake-btn">Retake quiz</button>
+              </div>
+              <p class="quiz-disclaimer-inline">For educational purposes only. Not personalized financial advice.</p>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      <section class="section tools" id="tools">
+      <script>
+(function () {
+  var elStart    = document.getElementById('q-start');
+  var elQuestion = document.getElementById('q-question');
+  var elResult   = document.getElementById('q-result');
+  var elLabel    = document.getElementById('q-label');
+  var elBar      = document.getElementById('q-bar');
+  var elText     = document.getElementById('q-text');
+  var elOptions  = document.getElementById('q-options');
+
+  var questions = [
+    { text: 'When you get paid, what usually happens first?', options: [
+      { label: 'I split it between bills, savings, and a budget right away', w: {saver:3} },
+      { label: 'I cover my bills and enjoy whatever is left', w: {spender:3} },
+      { label: 'I move money to investments before I spend anything else', w: {builder:2,optimizer:2} },
+      { label: 'Honestly, I just try to make it work each month', w: {catchup:2,avoider:1} }
+    ]},
+    { text: 'How honest are you about your bank balance right now?', options: [
+      { label: 'I know exactly — I check it daily and track everything', w: {saver:2,optimizer:2} },
+      { label: 'I know roughly, but I avoid looking too closely', w: {avoider:3,spender:1} },
+      { label: 'I check when something comes up or I need to decide', w: {spender:2} },
+      { label: 'I pay more attention to my investment accounts than my bank', w: {builder:3,optimizer:1} }
+    ]},
+    { text: 'An unexpected $500 drops into your account. You:', options: [
+      { label: 'Move it straight to savings or my emergency fund', w: {saver:3} },
+      { label: 'Spend it on something I have been wanting — I earned it', w: {spender:3} },
+      { label: 'Invest it — probably index fund shares', w: {builder:2,optimizer:2} },
+      { label: 'Use it to pay off a bill or debt I have been carrying', w: {catchup:3} }
+    ]},
+    { text: 'Pick the statement that feels most true for you right now:', options: [
+      { label: 'I save consistently but my money feels like it is not growing', w: {saver:3} },
+      { label: 'I spend more than I should and feel guilty about it every month', w: {spender:3} },
+      { label: 'Money gives me real anxiety — I tend to avoid dealing with it', w: {avoider:3} },
+      { label: 'I track every dollar and want to squeeze every percent of return', w: {optimizer:3} }
+    ]},
+    { text: 'What is your honest relationship with debt right now?', options: [
+      { label: 'Minimal — I hate carrying a balance and pay it off fast', w: {saver:2,optimizer:1} },
+      { label: 'I have some — mostly making minimum payments', w: {spender:2,avoider:1} },
+      { label: 'I use debt strategically only when the math makes sense', w: {builder:2,optimizer:2} },
+      { label: 'I have debt I am genuinely not sure how to tackle', w: {catchup:3} }
+    ]},
+    { text: 'When you think about investing right now:', options: [
+      { label: 'I have savings but have not actually started investing yet', w: {saver:3} },
+      { label: 'I have thought about it a lot but something keeps stopping me', w: {avoider:2,spender:1} },
+      { label: 'I am already in the market and always learning new strategies', w: {builder:2,optimizer:2} },
+      { label: 'Investing feels like a future thing — I need stability first', w: {catchup:2,avoider:1} }
+    ]},
+    { text: 'How do you make spending decisions?', options: [
+      { label: 'I have a budget with real category limits and I follow it', w: {saver:2,optimizer:1} },
+      { label: 'I go with how I feel — if I want it and can pay, I get it', w: {spender:3} },
+      { label: 'I research obsessively before buying anything significant', w: {optimizer:3} },
+      { label: 'I avoid spending wherever I can because I feel behind', w: {catchup:2,avoider:1} }
+    ]},
+    { text: 'Your #1 financial goal for the next 12 months?', options: [
+      { label: 'Build up (or protect) my savings and emergency fund', w: {saver:3} },
+      { label: 'Actually stick to a spending plan and stop the leaks', w: {spender:2,avoider:1} },
+      { label: 'Grow my investment portfolio and maximize long-term returns', w: {builder:2,optimizer:2} },
+      { label: 'Pay off debt and stop living month to month', w: {catchup:3} }
+    ]}
+  ];
+
+  var results = {
+    saver:     { emoji:'🏦', name:'The Safe Keeper',      tagline:'You save well — now make it grow.',                    desc:'You are disciplined and consistent — genuinely strong traits. But savings sitting in a low-yield account loses ground to inflation every year. Your next step is putting those dollars to work through investing.', chapters:[['investing','Investing Basics'],['budgeting','Budgeting Without Feeling Broke'],['ai','AI for Personal Finance']], tools:[['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['savings','Savings Goal Tracker']] },
+    spender:   { emoji:'💳', name:'The Lifestyle Builder', tagline:'Great at enjoying money — build a system for it.',      desc:'You know how to live well, but without a system, lifestyle creep quietly wins every month. A real budget does not restrict you — it makes your spending intentional so you can enjoy it without the guilt.', chapters:[['budgeting','Budgeting Without Feeling Broke'],['reset','Money Reset'],['credit','Credit Score Basics']], tools:[['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['debt_planner','Debt Payoff Planner']] },
+    builder:   { emoji:'📈', name:'The Long-Game Player',  tagline:'You think in decades. That is your biggest edge.',      desc:'You already have the mindset that separates wealth builders from everyone else. Now it is about optimizing your strategy, growing income, and letting compounding do the heavy lifting over time.', chapters:[['investing','Investing Basics'],['careers','Career and Income Growth'],['ai','AI for Personal Finance']], tools:[['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['email_gen','Career Email Generator']] },
+    avoider:   { emoji:'🌱', name:'The Stress Avoider',    tagline:'Money anxiety is real — and totally workable.',         desc:'Avoiding money topics is a stress response, not a character flaw. The goal is not perfection — it is one small step at a time. Start with the simplest chapter and build from there. Things get manageable faster than you think.', chapters:[['reset','Money Reset'],['budgeting','Budgeting Without Feeling Broke'],['credit','Credit Score Basics']], tools:[['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['credit_score','Credit Score Guide']] },
+    optimizer: { emoji:'⚡', name:'The Optimizer',         tagline:'The basics are handled — time for advanced moves.',    desc:'You track, analyze, and want to maximize every dollar — that is genuinely rare. The fundamentals are solid. Your edge is in fine-tuning: tax strategy, portfolio allocation, AI finance tools, and income acceleration.', chapters:[['investing','Investing Basics'],['ai','AI for Personal Finance'],['careers','Career and Income Growth']], tools:[['compound','Compound Interest Calculator'],['tax','Tax Estimator'],['invest_guide','Investing Learning Path']] },
+    catchup:   { emoji:'🚀', name:'The Comeback Kid',      tagline:'Starting over or starting late — here is your roadmap.', desc:'You are dealing with real financial pressure, not just theory. The goal right now is not perfection — it is stopping the bleeding, building a base, and stacking small wins that snowball. You are not behind forever. You are just starting.', chapters:[['reset','Money Reset'],['debt_payoff','Debt Payoff Strategy'],['budgeting','Budgeting Without Feeling Broke']], tools:[['debt_planner','Debt Payoff Planner'],['emergency','Emergency Fund Calculator'],['budget','Budget Builder']] }
+  };
+
+  var scores   = {saver:0, spender:0, builder:0, avoider:0, optimizer:0, catchup:0};
+  var currentQ = 0;
+
+  function show(el)  { el.style.display = ''; }
+  function hide(el)  { el.style.display = 'none'; }
+
+  function renderQuestion(idx) {
+    var q = questions[idx];
+    elLabel.textContent = 'Question ' + (idx + 1) + ' of ' + questions.length;
+    elBar.style.width   = ((idx / questions.length) * 100).toFixed(0) + '%';
+    elText.textContent  = q.text;
+    elOptions.innerHTML = '';
+    q.options.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.textContent = opt.label;
+      btn.addEventListener('click', function () {
+        Object.keys(opt.w).forEach(function (k) { scores[k] += opt.w[k]; });
+        currentQ++;
+        if (currentQ < questions.length) {
+          renderQuestion(currentQ);
+        } else {
+          renderResult();
+        }
+      });
+      elOptions.appendChild(btn);
+    });
+  }
+
+  function renderResult() {
+    elBar.style.width      = '100%';
+    elLabel.textContent    = 'Complete!';
+    var winner = Object.keys(scores).reduce(function (a, b) { return scores[a] >= scores[b] ? a : b; });
+    var r = results[winner];
+    document.getElementById('r-emoji').textContent   = r.emoji;
+    document.getElementById('r-tagline').textContent = r.tagline;
+    document.getElementById('r-name').textContent    = r.name;
+    document.getElementById('r-desc').textContent    = r.desc;
+    document.getElementById('r-chapters').innerHTML  = r.chapters.map(function (c) { return '<li><a href="lesson.html?topic=' + c[0] + '">' + c[1] + '</a></li>'; }).join('');
+    document.getElementById('r-tools').innerHTML     = r.tools.map(function (t) { return '<li><a href="tool.html?tool=' + t[0] + '">' + t[1] + '</a></li>'; }).join('');
+
+    // Save profile to localStorage so main site can use it
+    try { localStorage.setItem('bigProfile', JSON.stringify({ type: winner, name: r.name, emoji: r.emoji, tagline: r.tagline })); } catch(e) {}
+
+    hide(elQuestion);
+    show(elResult);
+  }
+
+  function resetQuiz() {
+    Object.keys(scores).forEach(function (k) { scores[k] = 0; });
+    currentQ = 0;
+    hide(elResult);
+    show(elQuestion);
+    renderQuestion(0);
+  }
+
+  document.getElementById('start-btn').addEventListener('click', function () {
+    hide(elStart);
+    show(elQuestion);
+    renderQuestion(0);
+  });
+
+  document.getElementById('retake-btn').addEventListener('click', resetQuiz);
+
+}());
+      </script>
+
+      <!-- ── 3. Financial Chapters ────────────────────────────────────────── -->
+      <section class="section chapters-section" id="chapters">
         <div class="section-head reveal">
-          <p class="eyebrow">Tools</p>
-          <h2>Practical calculators and AI helpers for everyday decisions.</h2>
-          <p>Cards open a live preview panel so every button does something useful on the page.</p>
+          <p class="eyebrow">Financial chapters</p>
+          <h2>Learn money in clear, practical steps.</h2>
+          <p>Seven chapters built for Gen Z. Each one is focused, actionable, and connects to the tools and AI workflows on this site.</p>
+        </div>
+
+        <div class="chapters-grid">
+          <a class="chapter-card reveal" href="lesson.html?topic=reset">
+            <span class="chapter-num">01</span>
+            <div class="chapter-body">
+              <h3>Money Reset</h3>
+              <p class="chapter-for">For anyone starting fresh or feeling behind</p>
+              <p>Understand your real net worth, map income vs. expenses, and complete a 3-step financial reset.</p>
+              <span class="chapter-meta">~8 min · Beginner</span>
+            </div>
+          <div class="chapter-progress"></div>
+          </a>
+
+          <a class="chapter-card reveal" href="lesson.html?topic=budgeting">
+            <span class="chapter-num">02</span>
+            <div class="chapter-body">
+              <h3>Budgeting Without Feeling Broke</h3>
+              <p class="chapter-for">For anyone who avoids budgeting because it feels restrictive</p>
+              <p>Build a flexible weekly budget system using needs, wants, savings, and a realistic buffer.</p>
+              <span class="chapter-meta">~10 min · Beginner</span>
+            </div>
+          <div class="chapter-progress"></div>
+          </a>
+
+          <a class="chapter-card reveal" href="lesson.html?topic=credit">
+            <span class="chapter-num">03</span>
+            <div class="chapter-body">
+              <h3>Credit Score Basics</h3>
+              <p class="chapter-for">For anyone opening a first card or trying to understand their score</p>
+              <p>Learn payment history, utilization, hard inquiries, and how to build credit responsibly.</p>
+              <span class="chapter-meta">~9 min · Beginner</span>
+            </div>
+          <div class="chapter-progress"></div>
+          </a>
+
+          <a class="chapter-card reveal" href="lesson.html?topic=debt_payoff">
+            <span class="chapter-num">04</span>
+            <div class="chapter-body">
+              <h3>Debt Payoff Strategy</h3>
+              <p class="chapter-for">For anyone making minimum payments and wanting a real plan</p>
+              <p>Compare snowball vs. avalanche, understand compound interest on debt, and build a payoff order.</p>
+              <span class="chapter-meta">~10 min · Beginner–Intermediate</span>
+            </div>
+          <div class="chapter-progress"></div>
+          </a>
+
+          <a class="chapter-card reveal" href="lesson.html?topic=investing">
+            <span class="chapter-num">05</span>
+            <div class="chapter-body">
+              <h3>Investing Basics</h3>
+              <p class="chapter-for">For anyone curious about investing but afraid to start</p>
+              <p>Index funds, diversification, risk tolerance, dollar-cost averaging, and the long-term mindset.</p>
+              <span class="chapter-meta">~12 min · Beginner</span>
+            </div>
+          <div class="chapter-progress"></div>
+          </a>
+
+          <a class="chapter-card reveal" href="lesson.html?topic=ai">
+            <span class="chapter-num">06</span>
+            <div class="chapter-body">
+              <h3>AI for Personal Finance</h3>
+              <p class="chapter-for">For anyone who wants to use AI tools responsibly</p>
+              <p>Budget prompts, spending review workflows, career tools, and a safety guide for what not to share.</p>
+              <span class="chapter-meta">~8 min · All levels</span>
+            </div>
+          <div class="chapter-progress"></div>
+          </a>
+
+          <a class="chapter-card reveal" href="lesson.html?topic=careers">
+            <span class="chapter-num">07</span>
+            <div class="chapter-body">
+              <h3>Career and Income Growth</h3>
+              <p class="chapter-for">For students and early-career professionals building their first opportunities</p>
+              <p>Networking, internship tracking, resume improvement, side hustles, and asking better questions.</p>
+              <span class="chapter-meta">~10 min · All levels</span>
+            </div>
+          <div class="chapter-progress"></div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ── 4. AI Money Playbooks ────────────────────────────────────────── -->
+      <section class="section playbooks-section" id="playbooks">
+        <div class="section-head reveal">
+          <p class="eyebrow">AI money playbooks</p>
+          <h2>Practical finance workflows you can use today.</h2>
+          <p>Each playbook solves one specific money problem. Copy the AI prompt, open ChatGPT or Claude, and follow the steps.</p>
+        </div>
+
+        <div class="playbooks-grid">
+
+          <article class="playbook-card reveal">
+            <div class="playbook-header">
+              <span class="playbook-tag">Budget</span>
+              <h3>Build a weekly budget in 10 minutes</h3>
+            </div>
+            <div class="playbook-who">
+              <p><span>Who:</span> Anyone who has avoided budgeting because it felt complicated</p>
+              <p><span>Solves:</span> Not knowing where money goes week to week</p>
+              <p><span>You get:</span> A simple weekly split + recurring Sunday review habit</p>
+            </div>
+            <div class="playbook-prompt-wrap">
+              <p class="prompt-label">Copy this AI prompt</p>
+              <p class="playbook-prompt-text" id="pb-prompt-0">I want to build a simple weekly budget. My monthly take-home income is [AMOUNT]. My fixed expenses include [LIST]. My flexible spending usually goes toward [CATEGORIES]. Create a realistic weekly budget that splits income into needs, wants, savings, and a small buffer. Keep it simple enough to actually maintain.</p>
+              <button class="copy-button" type="button" data-copy-target="pb-prompt-0">Copy prompt</button>
+            </div>
+            <a class="playbook-link" href="workflow.html?workflow=budget_quick">See full workflow + recommended apps →</a>
+          </article>
+
+          <article class="playbook-card reveal">
+            <div class="playbook-header">
+              <span class="playbook-tag">Spending</span>
+              <h3>Turn messy spending into categories</h3>
+            </div>
+            <div class="playbook-who">
+              <p><span>Who:</span> Anyone with confusing bank statements or random charges</p>
+              <p><span>Solves:</span> Not knowing what you actually spent money on</p>
+              <p><span>You get:</span> Clear categories, totals, and your biggest surprise</p>
+            </div>
+            <div class="playbook-prompt-wrap">
+              <p class="prompt-label">Copy this AI prompt</p>
+              <p class="playbook-prompt-text" id="pb-prompt-1">Here are my anonymized transactions for the month: [PASTE MERCHANT NAME + AMOUNT, one per line, no account numbers or personal info]. Group these into spending categories, calculate the total per category, identify my top 3, and flag any recurring charges. Give me a short summary and one realistic suggestion.</p>
+              <button class="copy-button" type="button" data-copy-target="pb-prompt-1">Copy prompt</button>
+            </div>
+            <a class="playbook-link" href="workflow.html?workflow=categorize">See full workflow + recommended apps →</a>
+          </article>
+
+          <article class="playbook-card reveal">
+            <div class="playbook-header">
+              <span class="playbook-tag">Debt</span>
+              <h3>Create a debt payoff plan</h3>
+            </div>
+            <div class="playbook-who">
+              <p><span>Who:</span> Anyone juggling multiple debts with no clear order</p>
+              <p><span>Solves:</span> Paying minimums forever without a path to freedom</p>
+              <p><span>You get:</span> Snowball vs. avalanche comparison with timelines</p>
+            </div>
+            <div class="playbook-prompt-wrap">
+              <p class="prompt-label">Copy this AI prompt</p>
+              <p class="playbook-prompt-text" id="pb-prompt-2">Help me create a debt payoff plan. My debts are: [LIST EACH: Name, Balance, Interest Rate %, Minimum Monthly Payment]. Show me the payoff order and estimated timeline using both the snowball method and avalanche method. Which saves more in total interest? Use plain numbers.</p>
+              <button class="copy-button" type="button" data-copy-target="pb-prompt-2">Copy prompt</button>
+            </div>
+            <a class="playbook-link" href="workflow.html?workflow=debt_plan">See full workflow + recommended apps →</a>
+          </article>
+
+          <article class="playbook-card reveal">
+            <div class="playbook-header">
+              <span class="playbook-tag">Investing</span>
+              <h3>Build a beginner investing learning path</h3>
+            </div>
+            <div class="playbook-who">
+              <p><span>Who:</span> Anyone curious about investing but not sure where to start</p>
+              <p><span>Solves:</span> Feeling overwhelmed by investing information</p>
+              <p><span>You get:</span> A personalized 8-week education plan with weekly actions</p>
+            </div>
+            <div class="playbook-prompt-wrap">
+              <p class="prompt-label">Copy this AI prompt</p>
+              <p class="playbook-prompt-text" id="pb-prompt-3">I am a beginner investor. My knowledge level is [BEGINNER / SOME BASICS / SOME EXPERIENCE]. I can invest about $[AMOUNT] per month and my time horizon is [SHORT / MEDIUM / LONG]. Create a personalized 8-week investing education plan. Each week: one concept to learn, one question to answer, one action to take. Focus on index funds and long-term strategy. Add a disclaimer.</p>
+              <button class="copy-button" type="button" data-copy-target="pb-prompt-3">Copy prompt</button>
+            </div>
+            <a class="playbook-link" href="workflow.html?workflow=invest_path">See full workflow + recommended apps →</a>
+          </article>
+
+          <article class="playbook-card reveal">
+            <div class="playbook-header">
+              <span class="playbook-tag">Career</span>
+              <h3>Write a networking email for finance internships</h3>
+            </div>
+            <div class="playbook-who">
+              <p><span>Who:</span> Finance students reaching out to analysts, associates, or recruiters</p>
+              <p><span>Solves:</span> Sending generic emails that get ignored</p>
+              <p><span>You get:</span> Two personalized email drafts ready to send</p>
+            </div>
+            <div class="playbook-prompt-wrap">
+              <p class="prompt-label">Copy this AI prompt</p>
+              <p class="playbook-prompt-text" id="pb-prompt-4">Help me write a cold networking email for a finance internship. My name is [NAME], a [YEAR/MAJOR] at [SCHOOL]. I am reaching out to [THEIR NAME], a [ROLE] at [COMPANY]. I am interested in [TEAM/ROLE]. One real thing I know about this company is [FACT]. Write a subject line and 3-sentence email with a low-pressure ask. Give me two versions: formal and slightly warmer.</p>
+              <button class="copy-button" type="button" data-copy-target="pb-prompt-4">Copy prompt</button>
+            </div>
+            <a class="playbook-link" href="workflow.html?workflow=network_email">See full workflow + recommended apps →</a>
+          </article>
+
+          <article class="playbook-card reveal">
+            <div class="playbook-header">
+              <span class="playbook-tag">Research</span>
+              <h3>Compare financial tools before choosing one</h3>
+            </div>
+            <div class="playbook-who">
+              <p><span>Who:</span> Anyone evaluating budgeting apps, brokerages, or credit cards</p>
+              <p><span>Solves:</span> Choosing tools based on marketing instead of real needs</p>
+              <p><span>You get:</span> A structured comparison with pros, cons, and costs</p>
+            </div>
+            <div class="playbook-prompt-wrap">
+              <p class="prompt-label">Copy this AI prompt</p>
+              <p class="playbook-prompt-text" id="pb-prompt-5">Compare these financial tools: [LIST TOOL NAMES]. I am trying to [GOAL]. For each tool: what it does, who it is best for, monthly cost, main downside, and where to find trustworthy reviews. Do not tell me which to pick — give me the information to decide. Keep each to 4–5 sentences.</p>
+              <button class="copy-button" type="button" data-copy-target="pb-prompt-5">Copy prompt</button>
+            </div>
+            <a class="playbook-link" href="workflow.html?workflow=compare_tools">See full workflow + recommended apps →</a>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ── 5. Tools ─────────────────────────────────────────────────────── -->
+      <section class="section tools-section" id="tools">
+        <div class="section-head reveal">
+          <p class="eyebrow">Interactive tools</p>
+          <h2>Calculators and helpers for real decisions.</h2>
+          <p>Click any card to preview the tool here. Each one opens a full interactive page.</p>
+          <p class="site-disclaimer">Tools are for education only. Results are estimates — not financial advice. Never enter real account numbers.</p>
         </div>
 
         <div class="tool-layout">
           <div class="tool-grid">
-            <article class="tool-card reveal is-active" data-tool-card="compound">
-              <span>Calculator</span>
-              <h3>Compound Interest Calculator</h3>
-              <p>See how time, contributions, and assumed returns can change long-term outcomes.</p>
-              <button type="button" data-tool-open="compound">Preview</button>
-              <a class="card-link" href="tool.html?tool=compound">Open full tool</a>
-            </article>
-            <article class="tool-card reveal" data-tool-card="credit">
-              <span>Calculator</span>
-              <h3>Credit Utilization Calculator</h3>
-              <p>Estimate how much of your available credit is being used.</p>
-              <button type="button" data-tool-open="credit">Preview</button>
-              <a class="card-link" href="tool.html?tool=credit">Open full tool</a>
-            </article>
-            <article class="tool-card reveal" data-tool-card="budget">
+            <article class="tool-card reveal is-active" data-tool-card="budget">
               <span>Planner</span>
               <h3>Budget Builder</h3>
-              <p>Split monthly income into needs, wants, savings, and debt payoff.</p>
+              <p>Split monthly income into needs, wants, savings, and debt using the 50/30/20 framework.</p>
               <button type="button" data-tool-open="budget">Preview</button>
               <a class="card-link" href="tool.html?tool=budget">Open full tool</a>
             </article>
-            <article class="tool-card reveal" data-tool-card="salary">
-              <span>Career</span>
-              <h3>Salary Breakdown Calculator</h3>
-              <p>Translate a salary into monthly and weekly take-home planning numbers.</p>
-              <button type="button" data-tool-open="salary">Preview</button>
-              <a class="card-link" href="tool.html?tool=salary">Open full tool</a>
-            </article>
-            <article class="tool-card reveal" data-tool-card="afford">
-              <span>Decision</span>
-              <h3>Can I Afford This? Analyzer</h3>
-              <p>Compare a purchase against income, savings goals, and opportunity cost.</p>
-              <button type="button" data-tool-open="afford">Preview</button>
-              <a class="card-link" href="tool.html?tool=afford">Open full tool</a>
-            </article>
-            <article class="tool-card reveal" data-tool-card="finder">
-              <span>AI</span>
-              <h3>AI Finance Tool Finder</h3>
-              <p>Match your current money question with a responsible AI workflow.</p>
-              <button type="button" data-tool-open="finder">Preview</button>
-              <a class="card-link" href="tool.html?tool=finder">Open full tool</a>
-            </article>
-          </div>
 
-          <aside class="tool-panel reveal" aria-live="polite">
-            <p class="panel-label" id="tool-panel-kicker">Live tool preview</p>
-            <h3 id="tool-panel-title">Compound Interest Calculator</h3>
-            <p id="tool-panel-copy">
-              Adjust the inputs to see an educational estimate of future value, total contributions, and growth.
-            </p>
+            <article class="tool-card reveal" data-tool-card="emergency">
+              <span>Safety Net</span>
+              <h3>Emergency Fund Calculator</h3>
+              <p>Enter monthly expenses and see your 1-, 3-, and 6-month emergency fund targets.</p>
+              <button type="button" data-tool-open="emergency">Preview</button>
+              <a class="card-link" href="tool.html?tool=emergency">Open full tool</a>
+            </article>
+
+            <article class="tool-card reveal" data-tool-card="credit">
+              <span>Credit</span>
+              <h3>Credit Utilization Calculator</h3>
+              <p>Estimate how much of your available credit is in use and understand the impact.</p>
+              <button type="button" data-tool-open="credit">Preview</button>
+              <a class="card-link" href="tool.html?tool=credit">Open full tool</a>
+            </article>
+
+            <article class="tool-card reveal" data-tool-card="debt_planner">
+              <span>Debt</span>
+              <h3>Debt Payoff Planner</h3>
+              <p>Compare snowball vs. avalanche with your real balance, rate, and minimum payment.</p>
+              <button type="button" data-tool-open="debt_planner">Preview</button>
+              <a class="card-link" href="tool.html?tool=debt_planner">Open full tool</a>
+                        </article>
+
+          </div><!-- /.tool-grid -->
+
+          <!-- Tool preview panel -->
+          <div class="tool-panel" id="tool-panel">
+            <p class="panel-label" id="tool-panel-kicker">Calculator</p>
+            <h3 id="tool-panel-title"></h3>
+            <p id="tool-panel-copy"></p>
             <div class="tool-preview" id="tool-preview"></div>
-          </aside>
-        </div>
+            <a class="button primary tool-panel-cta" id="tool-panel-link" href="tool.html">Open full tool →</a>
+          </div>
+
+        </div><!-- /.tools-section -->
       </section>
 
-      <section class="section education" id="education">
+      <!-- ── 6. Mission ─────────────────────────────────────────────────────── -->
+      <section class="section" id="mission">
         <div class="section-head reveal">
-          <p class="eyebrow">Education</p>
-          <h2>Short lessons built for students and young professionals.</h2>
+          <p class="eyebrow">Why this exists</p>
+          <h2>Finance education built for how you actually learn.</h2>
         </div>
-        <div class="education-grid">
-          <a class="lesson-card reveal" href="lesson.html?topic=investing">
-            <h3>Investing 101</h3>
-            <p>Learn risk, diversification, time horizon, and the difference between investing and speculating.</p>
-            <span>Read lesson</span>
-          </a>
-          <a class="lesson-card reveal" href="lesson.html?topic=credit">
-            <h3>Credit 101</h3>
-            <p>Understand utilization, payment history, credit mix, and how to protect your score early.</p>
-            <span>Read lesson</span>
-          </a>
-          <a class="lesson-card reveal" href="lesson.html?topic=budgeting">
-            <h3>Budgeting</h3>
-            <p>Build a simple system for income, expenses, savings, debt, and flexibility.</p>
-            <span>Read lesson</span>
-          </a>
-          <a class="lesson-card reveal" href="lesson.html?topic=ai">
-            <h3>AI for Personal Finance</h3>
-            <p>Use AI to organize questions, compare options, and build better financial habits.</p>
-            <span>Read lesson</span>
-          </a>
-          <a class="lesson-card reveal" href="lesson.html?topic=careers">
-            <h3>Finance Careers</h3>
-            <p>Connect classroom finance to internships, networking, resumes, and interview preparation.</p>
-            <span>Read lesson</span>
-          </a>
-          <a class="lesson-card reveal" href="lesson.html?topic=entrepreneurship">
-            <h3>Entrepreneurship</h3>
-            <p>Explore cash flow, pricing, margins, customer discovery, and small business fundamentals.</p>
-            <span>Read lesson</span>
-          </a>
-        </div>
-      </section>
-
-      <section class="section workflows" id="workflows">
-        <div class="section-head reveal">
-          <p class="eyebrow">AI workflows</p>
-          <h2>Responsible AI prompts for money, career, and productivity.</h2>
-        </div>
-        <div class="workflow-grid">
-          <a class="workflow-card reveal" href="workflow.html?workflow=budgeting">
-            <span>01</span>
-            <h3>AI Budgeting Workflow</h3>
-            <p>Turn transactions into categories, patterns, and a weekly action plan.</p>
-          </a>
-          <a class="workflow-card reveal" href="workflow.html?workflow=networking">
-            <span>02</span>
-            <h3>AI Internship Networking Workflow</h3>
-            <p>Research firms, draft outreach, and prepare better follow-up messages.</p>
-          </a>
-          <a class="workflow-card reveal" href="workflow.html?workflow=resume">
-            <span>03</span>
-            <h3>AI Resume Improvement Workflow</h3>
-            <p>Translate projects and experience into clearer impact bullets.</p>
-          </a>
-          <a class="workflow-card reveal" href="workflow.html?workflow=investing">
-            <span>04</span>
-            <h3>AI Investing Research Workflow</h3>
-            <p>Summarize filings, compare risks, and build questions before forming an opinion.</p>
-          </a>
-          <a class="workflow-card reveal" href="workflow.html?workflow=productivity">
-            <span>05</span>
-            <h3>AI Productivity Workflow</h3>
-            <p>Create weekly priorities, study plans, and decision checklists.</p>
-          </a>
-          <a class="workflow-card reveal" href="workflow.html?workflow=coding">
-            <span>06</span>
-            <h3>AI Coding + Automation Workflow</h3>
-            <p>Build small scripts, trackers, and automations that improve your money systems.</p>
-          </a>
-        </div>
-      </section>
-
-      <section class="section automation" id="automation">
-        <div class="section-head reveal">
-          <p class="eyebrow">Automation lab</p>
-          <h2>Use AI coding tools to automate small money systems.</h2>
-          <p>
-            The goal is not to build a complicated app first. Start with tiny automations that remove friction from
-            budgeting, career tracking, and financial habits.
-          </p>
-        </div>
-        <div class="automation-grid">
-          <a class="automation-card reveal" href="workflow.html?workflow=coding">
-            <span>Spreadsheet + AI</span>
-            <h3>Subscription tracker</h3>
-            <p>Flag recurring charges, renewal dates, and services you forgot you were paying for.</p>
-          </a>
-          <a class="automation-card reveal" href="workflow.html?workflow=coding">
-            <span>Simple script</span>
-            <h3>Budget category cleaner</h3>
-            <p>Turn messy transaction labels into clean categories you can review each week.</p>
-          </a>
-          <a class="automation-card reveal" href="workflow.html?workflow=coding">
-            <span>Career system</span>
-            <h3>Internship tracker</h3>
-            <p>Track applications, contacts, follow-ups, and next actions in one repeatable workflow.</p>
-          </a>
-          <a class="automation-card reveal" href="workflow.html?workflow=coding">
-            <span>Paycheck planning</span>
-            <h3>Income splitter</h3>
-            <p>Automatically split estimated income into spending, saving, investing education, and debt goals.</p>
-          </a>
-        </div>
-      </section>
-
-      <section class="section founder" id="founder">
-        <div class="founder-card reveal">
-          <div class="founder-mark" aria-hidden="true">RB</div>
-          <div>
-            <p class="eyebrow">Founder</p>
-            <h2>Ryan Barone</h2>
-            <p>
-              Ryan Barone is a Finance and Entrepreneurship student at Miami University building Barone Investment
-              Group to help students and young professionals understand money, investing, and AI in a practical way.
-            </p>
+        <div class="mission-grid">
+          <div class="reveal">
+            <h3>No fluff, no paywalls</h3>
+            <p>Every chapter, tool, and workflow on this site is free. No upsells, no email gates, no sponsored content. Just practical education.</p>
+          </div>
+          <div class="reveal">
+            <h3>AI-native by design</h3>
+            <p>Each chapter connects to real AI prompts you can use today. Not theory about AI — actual workflows for budgeting, debt payoff, investing, and career growth.</p>
+          </div>
+          <div class="reveal">
+            <h3>Built for Gen Z realities</h3>
+            <p>Student loans, gig income, no 401k match, starting late — this content meets you where you are, not where a 1990s finance textbook assumes you'd be.</p>
           </div>
         </div>
       </section>
 
-      <section class="section impact" id="impact">
-        <div class="section-head reveal">
-          <p class="eyebrow">Student impact</p>
-          <h2>Built to feel useful, not overwhelming.</h2>
-        </div>
-        <div class="testimonial-carousel reveal" aria-live="polite">
-          <button class="carousel-btn" type="button" data-carousel-prev aria-label="Previous testimonial">&lt;</button>
-          <article>
-            <p id="testimonial-copy">
-              "The AI workflow angle makes finance feel less intimidating. It gives me a starting point instead of
-              another lecture."
-            </p>
-            <strong id="testimonial-name">Student builder</strong>
-          </article>
-          <button class="carousel-btn" type="button" data-carousel-next aria-label="Next testimonial">&gt;</button>
+      <!-- ── 7. Founder Story ───────────────────────────────────────────────── -->
+      <section class="section" id="story">
+        <div class="founder-card reveal">
+          <div class="founder-text">
+            <p class="eyebrow">From the founder</p>
+            <h2>I built this because nobody taught me this stuff either.</h2>
+            <p>I'm Ryan Barone — a finance student who spent years figuring out things that should have taken weeks. Compound interest, credit utilization, debt payoff strategy, how to actually start investing. Nobody handed me a roadmap.</p>
+            <p>Barone Investment Group is that roadmap — built for students and young professionals who want to be financially literate without wading through jargon, Reddit threads, or $400 courses.</p>
+            <p>Everything here is free. Everything is practical. And everything connects to AI tools that make the learning stick.</p>
+          </div>
         </div>
       </section>
 
-      <section class="section faq" id="faq">
+      <!-- ── 8. FAQ ─────────────────────────────────────────────────────────── -->
+      <section class="section" id="faq">
         <div class="section-head reveal">
-          <p class="eyebrow">FAQ</p>
-          <h2>Clear answers before visitors click around.</h2>
+          <p class="eyebrow">Questions</p>
+          <h2>Common questions.</h2>
         </div>
         <div class="faq-list">
-          <article class="faq-item reveal">
-            <button type="button" aria-expanded="false">Is this personalized financial advice?</button>
-            <p>No. The site is educational and designed to help students learn concepts, workflows, and questions.</p>
-          </article>
-          <article class="faq-item reveal">
-            <button type="button" aria-expanded="false">How does AI fit into finance education?</button>
-            <p>AI can help summarize, organize, compare, and draft. It should not replace judgment or professional advice.</p>
-          </article>
-          <article class="faq-item reveal">
-            <button type="button" aria-expanded="false">Who is this built for?</button>
-            <p>Students, young professionals, and beginners who want a practical foundation in money and AI tools.</p>
-          </article>
+          <div class="faq-item reveal">
+            <button type="button" aria-expanded="false">Is this actual financial advice?</button>
+            <div class="faq-answer" hidden>
+              <p>No. Everything on this site is educational content only — not personalized financial, investment, legal, or tax advice. Always consult a licensed professional before making financial decisions.</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button type="button" aria-expanded="false">Is it free?</button>
+            <div class="faq-answer" hidden>
+              <p>Yes, entirely. No subscriptions, no paywalls, no email gates. All chapters, tools, and AI playbooks are free to use.</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button type="button" aria-expanded="false">Can I trust the AI prompts?</button>
+            <div class="faq-answer" hidden>
+              <p>The prompts are starting points designed to help you think through financial topics — not to replace a financial advisor. Never paste sensitive personal data (account numbers, SSN, passwords) into any AI tool.</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button type="button" aria-expanded="false">Who is this for?</button>
+            <div class="faq-answer" hidden>
+              <p>Gen Z students, recent graduates, and young professionals who want practical, jargon-free financial education. Whether you're starting from zero or trying to optimize what you already have, there's a path for you here.</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="section newsletter" id="newsletter">
+      <!-- ── 9. Newsletter ──────────────────────────────────────────────────── -->
+      <section class="section" id="newsletter">
         <div class="newsletter-card reveal">
           <div>
-            <p class="eyebrow">Newsletter</p>
-            <h2>Get weekly AI + finance tips built for Gen Z.</h2>
-            <p>Short, practical ideas for budgeting, investing education, credit, careers, and AI workflows.</p>
+            <p class="eyebrow">Stay in the loop</p>
+            <h2>New chapters, tools, and AI workflows — in your inbox.</h2>
+            <p>No spam. No fluff. Just updates when something new and useful ships.</p>
           </div>
-          <form class="signup-form" data-newsletter novalidate>
-            <label for="email">Email address</label>
-            <div class="signup-row">
-              <input id="email" name="email" type="email" placeholder="you@example.com" required />
-              <button class="button primary" type="submit">Join list</button>
-            </div>
-            <p class="form-message" data-form-message>Enter an email to preview the signup flow.</p>
+          <form class="signup-row" onsubmit="event.preventDefault(); this.innerHTML='<p style=\'color:var(--gold-2)\'>Thanks — you\'re in.</p>';">
+            <input type="email" placeholder="your@email.com" required aria-label="Email address" />
+            <button class="button primary" type="submit">Subscribe →</button>
           </form>
         </div>
       </section>
+
+      <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+      <footer class="site-footer" id="contact">
+        <div>
+          <a class="brand footer-brand" href="#top" aria-label="Barone Investment Group home">
+            <span class="brand-mark">B</span>
+            <span><strong>Barone</strong><small>Investment Group</small></span>
+          </a>
+          <p>Educational content only. Not personalized financial, investment, legal, or tax advice. Do not paste private account numbers or sensitive information into AI tools.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <a href="#quiz">Quiz</a>
+          <a href="#chapters">Chapters</a>
+          <a href="#playbooks">Playbooks</a>
+          <a href="#tools">Tools</a>
+          <a href="#mission">About</a>
+          <a href="mailto:hello@baroneinvestmentgroup.site">Contact</a>
+        </nav>
+        <div class="social-links" aria-label="Social channels">
+          <span class="social-soon">LinkedIn <em>coming soon</em></span>
+          <span class="social-soon">Instagram <em>coming soon</em></span>
+          <span class="social-soon">YouTube <em>coming soon</em></span>
+        </div>
+        <p class="footer-copy">&copy; 2025 Barone Investment Group. Educational content only.</p>
+      </footer>
     </main>
 
-    <footer class="site-footer" id="contact">
-      <div>
-        <a class="brand footer-brand" href="#top" aria-label="Barone Investment Group home">
-          <span class="brand-mark">B</span>
-          <span>
-            <strong>Barone</strong>
-            <small>Investment Group</small>
-          </span>
-        </a>
-        <p>Educational content only. This website does not provide personalized financial, legal, or tax advice.</p>
-      </div>
-      <nav aria-label="Footer navigation">
-        <a href="#mission">About</a>
-        <a href="#tools">Tools</a>
-        <a href="#education">Education</a>
-        <a href="#workflows">AI Workflows</a>
-        <a href="#automation">Automation</a>
-        <a href="mailto:hello@baroneinvestmentgroup.site">Contact</a>
-      </nav>
-      <div class="social-links" aria-label="Social links placeholders">
-        <a href="#top">LinkedIn</a>
-        <a href="#top">Instagram</a>
-        <a href="#top">TikTok</a>
-      </div>
-    </footer>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
 
-    <script src="script.js?v=20260520c"></script>
-  </body>
+  <!-- Typewriter effect for playbook prompts -->
+  <script>
+  (function () {
+    'use strict';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var prompts = Array.from(document.querySelectorAll('.playbook-prompt-text'));
+    if (!prompts.length) return;
+    var stored = prompts.map(function (el) {
+      var text = el.textContent;
+      el.textContent = '';
+      el.setAttribute('aria-label', text);
+      return text;
+    });
+    function typeEl(el, text) {
+      var i = 0;
+      el.classList.add('typing');
+      (function tick() {
+        if (i <= text.length) {
+          el.textContent = text.slice(0, i++);
+          setTimeout(tick, 11);
+        } else {
+          el.classList.remove('typing');
+        }
+      }());
+    }
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        var idx = prompts.indexOf(el);
+        if (idx === -1) return;
+        observer.unobserve(el);
+        typeEl(el, stored[idx]);
+      });
+    }, { threshold: 0.4 });
+    prompts.forEach(function (el) { observer.observe(el); });
+  }());
+  </script>
+
+</body>
 </html>
