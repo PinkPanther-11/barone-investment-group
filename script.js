@@ -183,6 +183,165 @@ const toolData = {
       update();
     },
   },
+  emergency: {
+    kicker: "Safety Net",
+    title: "Emergency Fund Calculator",
+    copy: "Enter your average monthly expenses to see your 1-, 3-, and 6-month emergency fund targets.",
+    html: `
+      <label>Monthly expenses <input id="emerg-expenses" type="number" min="0" value="1800" /></label>
+      <div class="spark-bars" id="emerg-bars" aria-hidden="true"></div>
+      <div class="result-box"><span>3-month target (recommended start)</span><strong id="emerg-result">$5,400</strong><small id="emerg-note">$1,800 × 3 months</small></div>
+    `,
+    init: () => {
+      const expenses = document.querySelector("#emerg-expenses");
+      const result = document.querySelector("#emerg-result");
+      const note = document.querySelector("#emerg-note");
+      const bars = document.querySelector("#emerg-bars");
+      const update = () => {
+        const e = Number(expenses.value) || 0;
+        result.textContent = formatCurrency(e * 3);
+        note.textContent = `${formatCurrency(e)} × 3 months`;
+        renderBars(bars, [e, e * 3, e * 6], ["1 mo", "3 mo", "6 mo"]);
+      };
+      expenses.addEventListener("input", update);
+      update();
+    },
+  },
+  debt_planner: {
+    kicker: "Debt",
+    title: "Debt Payoff Planner",
+    copy: "See how much faster you pay off debt with an extra monthly contribution. Educational estimate only.",
+    html: `
+      <label>Balance <input id="debt-balance" type="number" min="0" value="4500" /></label>
+      <label>Interest rate (% APR) <input id="debt-rate" type="number" min="0" max="40" value="19" step="0.5" /></label>
+      <label>Monthly payment <input id="debt-payment" type="number" min="0" value="150" /></label>
+      <div class="spark-bars" id="debt-bars" aria-hidden="true"></div>
+      <div class="result-box"><span>Estimated payoff</span><strong id="debt-result">36 months</strong><small id="debt-note">Add $50/mo to cut ~8 months</small></div>
+    `,
+    init: () => {
+      const balance = document.querySelector("#debt-balance");
+      const rate = document.querySelector("#debt-rate");
+      const payment = document.querySelector("#debt-payment");
+      const result = document.querySelector("#debt-result");
+      const note = document.querySelector("#debt-note");
+      const bars = document.querySelector("#debt-bars");
+      const monthsToPayoff = (b, apr, pay) => {
+        if (pay <= 0 || b <= 0) return 0;
+        const r = apr / 100 / 12;
+        if (r === 0) return Math.ceil(b / pay);
+        if (pay <= b * r) return Infinity;
+        return Math.ceil(-Math.log(1 - (b * r) / pay) / Math.log(1 + r));
+      };
+      const update = () => {
+        const b = Number(balance.value) || 0;
+        const apr = Number(rate.value) || 0;
+        const pay = Number(payment.value) || 0;
+        const base = monthsToPayoff(b, apr, pay);
+        const extra = monthsToPayoff(b, apr, pay + 50);
+        result.textContent = base === Infinity ? "Won't pay off" : `${base} months`;
+        note.textContent = base === Infinity
+          ? "Increase your payment above the monthly interest."
+          : extra < base ? `Add $50/mo to cut ~${base - extra} months` : "Already on a solid path";
+        renderBars(bars, [Math.min(base, 120), Math.min(extra, 120), Math.min(base * 0.5, 120)], ["Base", "+$50", "50%"]);
+      };
+      [balance, rate, payment].forEach((input) => input.addEventListener("input", update));
+      update();
+    },
+  },
+  email_gen: {
+    kicker: "Career",
+    title: "Networking Email Generator",
+    copy: "Fill in your context and get a professional email template to personalize before sending.",
+    html: `
+      <label>Your role/year
+        <select id="email-role">
+          <option value="student">College student</option>
+          <option value="recent">Recent graduate</option>
+          <option value="career">Early-career professional</option>
+        </select>
+      </label>
+      <label>Target contact type
+        <select id="email-target">
+          <option value="analyst">Analyst / Associate</option>
+          <option value="recruiter">Recruiter</option>
+          <option value="alumni">Alumni in finance</option>
+        </select>
+      </label>
+      <div class="result-box" style="font-size:0.86rem;line-height:1.6">
+        <span>Email template (personalize before sending)</span>
+        <strong id="email-subject" style="font-size:1rem;margin-bottom:6px"></strong>
+        <small id="email-body" style="white-space:pre-wrap;color:#b8b8b8"></small>
+      </div>
+    `,
+    init: () => {
+      const role = document.querySelector("#email-role");
+      const target = document.querySelector("#email-target");
+      const subject = document.querySelector("#email-subject");
+      const body = document.querySelector("#email-body");
+      const templates = {
+        analyst: {
+          student: ["Exploring finance — student at [School]", "Hi [Name],\n\nI'm a [Year] studying [Major] at [School] and am genuinely interested in [Company]'s work in [Area]. I'd love to learn about your path into the role.\n\nWould you be open to a 15-minute call in the next few weeks?\n\nThanks, [Your Name]"],
+          recent: ["Connecting — recent finance grad", "Hi [Name],\n\nI recently graduated in [Field] and am focused on [Company]'s approach to [Area]. I'd value any insight into how you approached your first year.\n\nWould a brief call work for you?\n\nBest, [Your Name]"],
+          career: ["Mutual interest in [Area] — career question", "Hi [Name],\n\nI'm currently in [Role] and following [Company]'s work closely. I'd appreciate 15 minutes to hear your perspective on [Topic].\n\nHappy to work around your schedule.\n\nBest, [Your Name]"],
+        },
+        recruiter: {
+          student: ["Finance internship inquiry — [School] student", "Hi [Name],\n\nI'm a [Year] at [School] targeting finance internships for [Season]. Is [Company] recruiting for [Role]? I'd love to learn about the process.\n\nThank you, [Your Name]"],
+          recent: ["Open roles at [Company] — recent grad", "Hi [Name],\n\nI'm a recent grad with [Skill] experience and strong interest in [Company]. Are there any open [Role] positions I could apply for?\n\nThank you, [Your Name]"],
+          career: ["Career transition — interest in [Company]", "Hi [Name],\n\nI'm transitioning into [Field] with background in [Current Area]. I'd love to explore fit for any open roles at [Company].\n\nBest, [Your Name]"],
+        },
+        alumni: {
+          student: ["Reaching out — [School] student", "Hi [Name],\n\nI found your profile through [School] alumni network. I'm studying [Major] and would value 15 minutes to hear how you broke into finance.\n\nNo pressure at all — thanks either way.\n\n[Your Name]"],
+          recent: ["Alumni connection — career question", "Hi [Name],\n\nWe share [School] as alumni. I'm navigating my first year in finance and would love a quick conversation about your experience.\n\nHappy to keep it to 15 minutes.\n\n[Your Name]"],
+          career: ["[School] alumni — quick question", "Hi [Name],\n\nFellow [School] grad here. I'm currently in [Field] and considering a move toward [Area] — I'd value your perspective given your path.\n\nWould a brief call work?\n\n[Your Name]"],
+        },
+      };
+      const update = () => {
+        const t = templates[target.value]?.[role.value];
+        if (t) {
+          subject.textContent = "Subject: " + t[0];
+          body.textContent = t[1];
+        }
+      };
+      [role, target].forEach((el) => el.addEventListener("change", update));
+      update();
+    },
+  },
+  invest_guide: {
+    kicker: "Learning",
+    title: "Investing Learning Path",
+    copy: "Choose your starting point to see a structured beginner roadmap for index investing.",
+    html: `
+      <label>Your experience level
+        <select id="guide-level">
+          <option value="zero">Complete beginner (never invested)</option>
+          <option value="aware">Aware but haven't started</option>
+          <option value="some">Have a brokerage, unsure what to do</option>
+        </select>
+      </label>
+      <div class="result-box">
+        <span>Your next 4 steps</span>
+        <strong id="guide-title" style="font-size:1rem"></strong>
+        <small id="guide-steps" style="white-space:pre-wrap;color:#b8b8b8;line-height:1.7"></small>
+      </div>
+    `,
+    init: () => {
+      const level = document.querySelector("#guide-level");
+      const title = document.querySelector("#guide-title");
+      const steps = document.querySelector("#guide-steps");
+      const paths = {
+        zero: ["Start here: build your base first", "1. Open a free brokerage account (Fidelity or Schwab)\n2. Complete Chapter 5 — Investing Basics on this site\n3. Learn what an index fund is (S&P 500 ETF)\n4. Set up a $25/month auto-invest to start the habit"],
+        aware: ["You're ready to open your first position", "1. Compare Fidelity vs. Vanguard vs. Schwab fees\n2. Open a Roth IRA if you have earned income\n3. Buy one broad index ETF (VTI or FXAIX)\n4. Set a reminder to review in 90 days, not 90 minutes"],
+        some: ["Refine and automate your strategy", "1. Check your current holdings against a 3-fund portfolio\n2. Set up automatic monthly contributions\n3. Review expense ratios — target under 0.20%\n4. Use the Compound Interest Calculator to model your 10-year path"],
+      };
+      const update = () => {
+        const [t, s] = paths[level.value];
+        title.textContent = t;
+        steps.textContent = s;
+      };
+      level.addEventListener("change", update);
+      update();
+    },
+  },
 };
 
 const testimonials = [
@@ -299,7 +458,7 @@ document.querySelectorAll("[data-counter]").forEach((counter) => counterObserver
 document.querySelectorAll("[data-tool-open]").forEach((button) => {
   button.addEventListener("click", () => openTool(button.dataset.toolOpen));
 });
-openTool("compound");
+openTool("budget");
 
 let testimonialIndex = 0;
 const testimonialCopy = document.querySelector("#testimonial-copy");
@@ -339,7 +498,7 @@ newsletter.addEventListener("submit", (event) => {
     return;
   }
 
-  formMessage.textContent = "You're on the preview list. Connect a real email service before launch.";
+  formMessage.textContent = "You're on the list! Expect weekly AI + finance tips built for Gen Z.";
   newsletter.classList.add("is-success");
   newsletter.reset();
 });
@@ -405,3 +564,279 @@ function drawMarketCanvas() {
 }
 
 drawMarketCanvas();
+
+// ── Full-page background particle network ────────────────────────────────────
+(function () {
+  const bg = document.querySelector("#page-bg-canvas");
+  if (!bg) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const bgCtx = bg.getContext("2d");
+  let pts = [];
+  let bgAnimId;
+
+  function resize() {
+    bg.width = window.innerWidth;
+    bg.height = window.innerHeight;
+    initPts();
+  }
+
+  function initPts() {
+    const count = window.innerWidth < 700 ? 24 : 52;
+    pts = Array.from({ length: count }, (_, i) => ({
+      x: Math.random() * bg.width,
+      y: Math.random() * bg.height,
+      vx: (Math.random() - 0.5) * 0.14,
+      vy: (Math.random() - 0.5) * 0.14,
+      r: Math.random() * 1.4 + 0.5,
+      gold: i % 7 === 0, // occasional gold-tinted node
+    }));
+  }
+
+  function drawBg() {
+    const w = bg.width;
+    const h = bg.height;
+    const maxDist = 180;
+    bgCtx.clearRect(0, 0, w, h);
+
+    for (const p of pts) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+    }
+
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const dx = pts[i].x - pts[j].x;
+        const dy = pts[i].y - pts[j].y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < maxDist) {
+          const alpha = (1 - d / maxDist) * 0.065;
+          bgCtx.strokeStyle = `rgba(255,255,255,${alpha})`;
+          bgCtx.lineWidth = 0.6;
+          bgCtx.beginPath();
+          bgCtx.moveTo(pts[i].x, pts[i].y);
+          bgCtx.lineTo(pts[j].x, pts[j].y);
+          bgCtx.stroke();
+        }
+      }
+    }
+
+    for (const p of pts) {
+      bgCtx.fillStyle = p.gold ? "rgba(215,181,109,0.3)" : "rgba(255,255,255,0.18)";
+      bgCtx.beginPath();
+      bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      bgCtx.fill();
+    }
+
+    bgAnimId = requestAnimationFrame(drawBg);
+  }
+
+  resize();
+  drawBg();
+
+  let rsTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(rsTimer);
+    rsTimer = setTimeout(() => {
+      cancelAnimationFrame(bgAnimId);
+      resize();
+      drawBg();
+    }, 250);
+  }, { passive: true });
+})();
+
+// ── Hero Compound Calculator ────────────────────────────────────────────────
+(function () {
+  var slider  = document.querySelector('#hero-save-slider');
+  var display = document.querySelector('#hero-save-display');
+  var canvas  = document.querySelector('#hero-compound-canvas');
+  var v10     = document.querySelector('#hcv-10');
+  var v20     = document.querySelector('#hcv-20');
+  var v30     = document.querySelector('#hcv-30');
+  if (!slider || !canvas) return;
+
+  var ctx    = canvas.getContext('2d');
+  var YEARS  = 30;
+  var animId = null;
+  var currentMonthly = 200;
+
+  /* future value of monthly contributions */
+  function fv(monthly, annualRate, years) {
+    var r = annualRate / 12;
+    var n = years * 12;
+    if (r === 0) return monthly * n;
+    return monthly * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+  }
+
+  function fmt(n) {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
+    return '$' + Math.round(n);
+  }
+
+  /* size canvas to its CSS box */
+  function sizeCanvas() {
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    canvas.width  = Math.round(rect.width  * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    return { w: canvas.width, h: canvas.height, dpr: dpr };
+  }
+
+  /* draw the full chart for a given progress ratio (0→1 for animation) */
+  function drawChart(monthly, progress) {
+    var dim = sizeCanvas();
+    var W = dim.w, H = dim.h, dpr = dim.dpr;
+    if (W === 0 || H === 0) return;
+
+    var pad = { t: 14*dpr, r: 14*dpr, b: 26*dpr, l: 52*dpr };
+    var cw  = W - pad.l - pad.r;
+    var ch  = H - pad.t - pad.b;
+
+    ctx.clearRect(0, 0, W, H);
+
+    /* data: three scenarios */
+    var lines = [
+      { rate: 0.04, color: 'rgba(255,255,255,0.22)', width: 1.5*dpr, label: '4%' },
+      { rate: 0.07, color: '#d7b56d',               width: 3*dpr,   label: '7%' },
+      { rate: 0.10, color: 'rgba(242,217,144,0.55)', width: 1.5*dpr, label: '10%' },
+    ];
+
+    var maxVal = fv(monthly, 0.10, YEARS) * 1.1;
+
+    function xOf(yr)  { return pad.l + (yr / YEARS) * cw; }
+    function yOf(val) { return pad.t + ch - (val / maxVal) * ch; }
+
+    /* subtle horizontal grid */
+    var gridY = [0.25, 0.5, 0.75, 1.0];
+    ctx.setLineDash([3*dpr, 5*dpr]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    gridY.forEach(function(f) {
+      var y = yOf(maxVal * f);
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cw, y); ctx.stroke();
+      /* y-axis label */
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.font = (9*dpr) + 'px Inter,sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(fmt(maxVal * f), pad.l - 6*dpr, y + 3*dpr);
+    });
+    ctx.setLineDash([]);
+
+    /* x-axis labels */
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = (9*dpr) + 'px Inter,sans-serif';
+    ctx.textAlign = 'center';
+    [0, 5, 10, 15, 20, 25, 30].forEach(function(yr) {
+      ctx.fillText(yr === 0 ? 'Now' : yr + 'yr', xOf(yr), H - 6*dpr);
+    });
+
+    /* draw each rate line — animated via progress */
+    var maxYr = YEARS * progress;
+    lines.forEach(function(line) {
+      ctx.strokeStyle = line.color;
+      ctx.lineWidth   = line.width;
+      ctx.lineJoin    = 'round';
+      ctx.beginPath();
+      var steps = 120;
+      var started = false;
+      for (var i = 0; i <= steps; i++) {
+        var yr  = (i / steps) * maxYr;
+        var val = fv(monthly, line.rate, yr);
+        var x   = xOf(yr);
+        var y   = yOf(val);
+        if (!started) { ctx.moveTo(x, y); started = true; }
+        else           { ctx.lineTo(x, y); }
+      }
+      ctx.stroke();
+    });
+
+    /* gold glow dots at 10 / 20 / 30 on the 7% line */
+    if (progress >= 1) {
+      [10, 20, 30].forEach(function(yr) {
+        var val = fv(monthly, 0.07, yr);
+        var x   = xOf(yr);
+        var y   = yOf(val);
+        /* outer glow */
+        ctx.beginPath();
+        ctx.arc(x, y, 7*dpr, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(215,181,109,0.18)';
+        ctx.fill();
+        /* inner dot */
+        ctx.beginPath();
+        ctx.arc(x, y, 4*dpr, 0, Math.PI*2);
+        ctx.fillStyle = '#f2d990';
+        ctx.fill();
+      });
+    }
+
+    /* legend — top right */
+    var lx = W - pad.r - 2*dpr;
+    var ly = pad.t + 8*dpr;
+    [{ color:'rgba(255,255,255,0.35)', label:'4% conservative' },
+     { color:'#d7b56d',               label:'7% moderate' },
+     { color:'rgba(242,217,144,0.55)', label:'10% optimistic' }].forEach(function(item, i) {
+      var y = ly + i * 16*dpr;
+      ctx.strokeStyle = item.color;
+      ctx.lineWidth   = 2*dpr;
+      ctx.beginPath(); ctx.moveTo(lx - 32*dpr, y); ctx.lineTo(lx - 12*dpr, y); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = (8.5*dpr) + 'px Inter,sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(item.label, lx - 34*dpr, y + 3*dpr);
+    });
+  }
+
+  /* animate chart drawing in ~600 ms */
+  function animateDraw(monthly) {
+    if (animId) cancelAnimationFrame(animId);
+    var start = null;
+    var duration = 600;
+    function step(ts) {
+      if (!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      /* ease-out */
+      var eased = 1 - Math.pow(1 - progress, 3);
+      drawChart(monthly, eased);
+      if (progress < 1) animId = requestAnimationFrame(step);
+      else animId = null;
+    }
+    animId = requestAnimationFrame(step);
+  }
+
+  function updateValues(m) {
+    var pct = ((m - 50) / (2000 - 50) * 100).toFixed(1);
+    slider.style.setProperty('--pct', pct + '%');
+    display.textContent = '$' + Number(m).toLocaleString();
+    v10.textContent = fmt(fv(m, 0.07, 10));
+    v20.textContent = fmt(fv(m, 0.07, 20));
+    v30.textContent = fmt(fv(m, 0.07, 30));
+  }
+
+  function onInput() {
+    currentMonthly = Number(slider.value);
+    updateValues(currentMonthly);
+    /* redraw instantly (no animation) while dragging */
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    drawChart(currentMonthly, 1);
+  }
+
+  slider.addEventListener('input', onInput);
+
+  /* re-draw on resize */
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() { drawChart(currentMonthly, 1); }, 120);
+  });
+
+  /* initial draw — defer until layout is painted */
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      updateValues(currentMonthly);
+      animateDraw(currentMonthly);
+    });
+  });
+})();

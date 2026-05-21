@@ -82,6 +82,20 @@ function renderWorkflow() {
   document.querySelector("#workflow-steps").innerHTML = list(item.steps);
   document.querySelector("#workflow-automation").textContent = item.automation;
   document.querySelector("#workflow-prompt").textContent = item.prompt;
+
+  const toolsContainer = document.querySelector("#workflow-tools");
+  if (toolsContainer && item.resources && item.resources.length) {
+    toolsContainer.innerHTML = item.resources
+      .map(
+        (r) =>
+          `<a class="workflow-tool-chip" href="${r.url}" target="_blank" rel="noopener noreferrer">
+            <strong>${r.name}</strong>
+            <span>${r.note}</span>
+          </a>`
+      )
+      .join("");
+  }
+
   renderRelated(content.workflows, key, "workflow.html?workflow=");
 }
 
@@ -211,6 +225,124 @@ const toolRenderers = {
       document.querySelector("#tool-page-note").textContent = "AI should help structure the task, not make the final decision.";
     };
     controls.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
+    update();
+  },
+  emergency() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Monthly expenses <input id="p-expenses" type="range" min="500" max="6000" value="1800" step="100" /></label>
+    `;
+    const update = () => {
+      const e = Number(document.querySelector("#p-expenses").value);
+      drawChart([e, e * 3, e * 6], ["1 mo", "3 mo", "6 mo"]);
+      document.querySelector("#tool-page-result").textContent = money(e * 3);
+      document.querySelector("#tool-page-note").textContent = `3-month target based on ${money(e)}/mo expenses`;
+    };
+    controls.querySelector("input").addEventListener("input", update);
+    update();
+  },
+  debt_planner() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Balance <input id="p-debt-balance" type="range" min="500" max="20000" value="4500" step="250" /></label>
+      <label>APR (%) <input id="p-debt-rate" type="range" min="5" max="30" value="19" step="0.5" /></label>
+      <label>Monthly payment <input id="p-debt-pay" type="range" min="25" max="1000" value="150" step="25" /></label>
+    `;
+    const monthsTo = (b, apr, pay) => {
+      const r = apr / 100 / 12;
+      if (pay <= 0 || b <= 0) return 0;
+      if (r === 0) return Math.ceil(b / pay);
+      if (pay <= b * r) return 999;
+      return Math.ceil(-Math.log(1 - (b * r) / pay) / Math.log(1 + r));
+    };
+    const update = () => {
+      const b = Number(document.querySelector("#p-debt-balance").value);
+      const apr = Number(document.querySelector("#p-debt-rate").value);
+      const pay = Number(document.querySelector("#p-debt-pay").value);
+      const base = monthsTo(b, apr, pay);
+      const extra = monthsTo(b, apr, pay + 50);
+      drawChart([Math.min(base, 120), Math.min(extra, 120), Math.min(base * 0.6, 120)], ["base", "+$50", "min"]);
+      document.querySelector("#tool-page-result").textContent = base >= 999 ? "Won't pay off" : `${base} months`;
+      document.querySelector("#tool-page-note").textContent = base < 999 && extra < base ? `Add $50/mo → saves ~${base - extra} months` : "Increase monthly payment above interest charge";
+    };
+    controls.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
+    update();
+  },
+  email_gen() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Your role
+        <select id="p-email-role">
+          <option value="student">College student</option>
+          <option value="recent">Recent graduate</option>
+          <option value="career">Early-career professional</option>
+        </select>
+      </label>
+      <label>Contact type
+        <select id="p-email-target">
+          <option value="analyst">Analyst / Associate</option>
+          <option value="recruiter">Recruiter</option>
+          <option value="alumni">Alumni in finance</option>
+        </select>
+      </label>
+    `;
+    const templates = {
+      analyst: {
+        student: "Hi [Name], I'm a [Year] studying [Major] at [School] and am genuinely interested in [Company]'s work in [Area]. I'd love to learn about your path into the role. Would you be open to a 15-minute call? Thanks, [Your Name]",
+        recent: "Hi [Name], I recently graduated in [Field] and am focused on [Company]'s approach to [Area]. I'd value any insight into how you approached your first year. Would a brief call work? Best, [Your Name]",
+        career: "Hi [Name], I'm currently in [Role] and following [Company]'s work closely. I'd appreciate 15 minutes to hear your perspective on [Topic]. Happy to work around your schedule. Best, [Your Name]",
+      },
+      recruiter: {
+        student: "Hi [Name], I'm a [Year] at [School] targeting finance internships for [Season]. Is [Company] recruiting for [Role]? I'd love to learn about the process. Thank you, [Your Name]",
+        recent: "Hi [Name], I'm a recent grad with [Skill] experience and strong interest in [Company]. Are there any open [Role] positions I could apply for? Thank you, [Your Name]",
+        career: "Hi [Name], I'm transitioning into [Field] with background in [Current Area]. I'd love to explore fit for any open roles at [Company]. Best, [Your Name]",
+      },
+      alumni: {
+        student: "Hi [Name], I found your profile through [School]'s alumni network. I'm studying [Major] and would value 15 minutes to hear how you broke into finance. No pressure at all. [Your Name]",
+        recent: "Hi [Name], we share [School] as alumni. I'm navigating my first year in finance and would love a quick conversation about your experience. [Your Name]",
+        career: "Hi [Name], fellow [School] grad here. I'm considering a move toward [Area] and would value your perspective given your path. [Your Name]",
+      },
+    };
+    const canvas = document.querySelector("#tool-page-chart");
+    canvas.style.display = "none";
+    const resultEl = document.querySelector("#tool-page-result");
+    const noteEl = document.querySelector("#tool-page-note");
+    const update = () => {
+      const role = document.querySelector("#p-email-role").value;
+      const target = document.querySelector("#p-email-target").value;
+      const tmpl = templates[target]?.[role] || "";
+      resultEl.textContent = "Template ready";
+      noteEl.textContent = tmpl;
+    };
+    controls.querySelectorAll("select").forEach((sel) => sel.addEventListener("change", update));
+    update();
+  },
+  invest_guide() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Your experience level
+        <select id="p-guide-level">
+          <option value="zero">Complete beginner (never invested)</option>
+          <option value="aware">Aware but haven't started yet</option>
+          <option value="some">Have a brokerage, unsure what to do</option>
+        </select>
+      </label>
+    `;
+    const paths = {
+      zero: { steps: [3, 5, 8, 10], labels: ["Step 1", "Step 2", "Step 3", "Step 4"], note: "Open account → Learn index funds → Invest $25 → Build the habit" },
+      aware: { steps: [5, 8, 10, 9], labels: ["Compare", "Open IRA", "First ETF", "Review"], note: "Compare brokerages → Open Roth IRA → Buy VTI → Set 90-day review" },
+      some: { steps: [7, 8, 10, 9], labels: ["Audit", "Automate", "Fees", "Model"], note: "Audit holdings → Automate contributions → Cut fees → Model growth" },
+    };
+    const canvas = document.querySelector("#tool-page-chart");
+    if (canvas) canvas.style.display = "block";
+    const update = () => {
+      const level = document.querySelector("#p-guide-level").value;
+      const { steps, labels, note } = paths[level];
+      drawChart(steps, labels);
+      document.querySelector("#tool-page-result").textContent = "Your roadmap";
+      document.querySelector("#tool-page-note").textContent = note;
+    };
+    controls.querySelector("select").addEventListener("change", update);
     update();
   },
 };
