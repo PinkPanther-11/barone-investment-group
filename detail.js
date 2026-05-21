@@ -2,6 +2,21 @@ const params = new URLSearchParams(window.location.search);
 const key = params.get("topic") || params.get("workflow") || params.get("tool") || "investing";
 const type = document.querySelector("[data-detail-type]")?.dataset.detailType;
 const content = window.BIG_CONTENT;
+const lessonToolMap = {
+  investing: ["compound", "budget"],
+  credit: ["credit"],
+  budgeting: ["budget"],
+  ai: ["budget", "compound", "credit", "debt_planner"],
+  careers: ["budget", "compound"],
+  entrepreneurship: ["budget", "compound"],
+  diversification: ["compound"],
+  stocks: ["compound"],
+  etfs: ["compound"],
+  reset: ["budget", "credit"],
+  debt_payoff: ["debt_planner", "budget"],
+  taxes_paychecks: ["budget"],
+  insurance_risk: ["budget"],
+};
 
 function money(value) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
@@ -16,6 +31,69 @@ function slugTitle(slug) {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function logoDomain(app) {
+  if (app.logoDomain || app.domain) return app.logoDomain || app.domain;
+  try {
+    return new URL(app.url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+function renderApps(apps = []) {
+  const section = document.querySelector("#recommended-apps");
+  const container = document.querySelector("#detail-apps");
+  if (!section || !container) return;
+  if (!apps.length) {
+    section.hidden = true;
+    container.innerHTML = "";
+    return;
+  }
+  section.hidden = false;
+  container.innerHTML = apps
+    .map((app) => {
+      const domain = logoDomain(app);
+      const logo = app.logo || (domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : "");
+      const backupLogo = domain ? `https://logo.clearbit.com/${domain}` : "";
+      const fallback = app.name ? app.name.charAt(0) : "B";
+      return `<a class="app-card" href="${app.url}" target="_blank" rel="noopener noreferrer">
+        <span class="app-logo-wrap">${logo ? `<img src="${logo}" alt="${app.name} logo" loading="lazy" onerror="${backupLogo ? `this.onerror=function(){this.replaceWith(document.createTextNode('${fallback}'))};this.src='${backupLogo}'` : `this.replaceWith(document.createTextNode('${fallback}'))`}" />` : fallback}</span>
+        <span class="app-copy">
+          <strong>${app.name}</strong>
+          <span>${app.note}</span>
+          <small>${app.cost || "Check website for pricing"}</small>
+        </span>
+      </a>`;
+    })
+    .join("");
+}
+
+function renderLessonTools(currentKey, toolKeys = []) {
+  const section = document.querySelector("#chapter-tools");
+  const container = document.querySelector("#detail-tools");
+  if (!section || !container) return;
+  const keys = toolKeys.length ? toolKeys : lessonToolMap[currentKey] || [];
+  const tools = keys
+    .map((toolKey) => [toolKey, content.tools?.[toolKey]])
+    .filter(([, tool]) => Boolean(tool));
+  if (!tools.length) {
+    section.hidden = true;
+    container.innerHTML = "";
+    return;
+  }
+  section.hidden = false;
+  container.innerHTML = tools
+    .map(
+      ([toolKey, tool]) => `<a class="lesson-tool-card" href="tool.html?tool=${toolKey}">
+        <span>Interactive tool</span>
+        <strong>${tool.title}</strong>
+        <p>${tool.summary}</p>
+        <small>Open tool</small>
+      </a>`
+    )
+    .join("");
 }
 
 function renderRelated(collection, currentKey, hrefPrefix, limit = 3) {
@@ -65,11 +143,36 @@ function renderLesson() {
   document.querySelector("#detail-summary").textContent = item.summary;
   document.querySelector("#detail-audience").textContent = item.audience;
   document.querySelector("#detail-outcomes").innerHTML = list(item.outcomes);
+  const quickWin = document.querySelector("#module-quick-win");
+  const moduleNav = document.querySelector("#module-nav");
+  if (quickWin) quickWin.textContent = item.checklist?.[0] || "Start with one small action from the checklist below.";
+  if (moduleNav) {
+    moduleNav.innerHTML = item.sections
+      .map(
+        (section, index) =>
+          `<a href="#lesson-step-${index + 1}">
+            <span>${String(index + 1).padStart(2, "0")}</span>
+            <strong>${section.title}</strong>
+          </a>`
+      )
+      .join("");
+  }
   document.querySelector("#detail-sections").innerHTML = item.sections
-    .map((section) => `<article class="detail-panel"><h2>${section.title}</h2><p>${section.body}</p></article>`)
+    .map(
+      (section, index) => `<article class="module-lesson-card" id="lesson-step-${index + 1}">
+        <div class="lesson-step-num">${String(index + 1).padStart(2, "0")}</div>
+        <div>
+          <p class="panel-label">${index === 0 ? "Start Here" : "Lesson Step"}</p>
+          <h2>${section.title}</h2>
+          <p>${section.body}</p>
+        </div>
+      </article>`
+    )
     .join("");
   document.querySelector("#detail-checklist").innerHTML = list(item.checklist);
   document.querySelector("#detail-prompt").textContent = item.prompt;
+  renderLessonTools(key, item.tools);
+  renderApps(item.apps);
   renderRelated(content.lessons, key, "lesson.html?topic=");
 }
 
@@ -82,10 +185,24 @@ function renderWorkflow() {
   document.querySelector("#workflow-steps").innerHTML = list(item.steps);
   document.querySelector("#workflow-automation").textContent = item.automation;
   document.querySelector("#workflow-prompt").textContent = item.prompt;
+
+  const toolsContainer = document.querySelector("#workflow-tools");
+  if (toolsContainer && item.resources && item.resources.length) {
+    toolsContainer.innerHTML = item.resources
+      .map(
+        (r) =>
+          `<a class="workflow-tool-chip" href="${r.url}" target="_blank" rel="noopener noreferrer">
+            <strong>${r.name}</strong>
+            <span>${r.note}</span>
+          </a>`
+      )
+      .join("");
+  }
+
   renderRelated(content.workflows, key, "workflow.html?workflow=");
 }
 
-function drawChart(values, labels) {
+function drawChart(values, labels, colors = ["#60a5fa", "#f2d990", "#22c55e", "#fb7185", "#a78bfa"]) {
   const canvas = document.querySelector("#tool-page-chart");
   const ctx = canvas.getContext("2d");
   const width = canvas.width;
@@ -101,8 +218,8 @@ function drawChart(values, labels) {
     const x = gap + index * (barWidth + gap);
     const y = height - barHeight - 36;
     const gradient = ctx.createLinearGradient(0, y, 0, height);
-    gradient.addColorStop(0, "#f2d990");
-    gradient.addColorStop(1, "#8f7138");
+    gradient.addColorStop(0, colors[index % colors.length]);
+    gradient.addColorStop(1, "rgba(255,255,255,0.16)");
     ctx.fillStyle = gradient;
     ctx.fillRect(x, y, barWidth, barHeight);
     ctx.fillStyle = "rgba(255,255,255,0.78)";
@@ -111,25 +228,55 @@ function drawChart(values, labels) {
   });
 }
 
+function pageControl(label, id, min, max, value, step = 1, prefix = "", suffix = "") {
+  return `<label class="tool-control-row"><span>${label} <strong id="${id}-value">${prefix}${value}${suffix}</strong></span><input id="${id}" type="range" min="${min}" max="${max}" value="${value}" step="${step}" /></label>`;
+}
+
+function setPageControlValue(id, value, prefix = "", suffix = "") {
+  const target = document.querySelector(`#${id}-value`);
+  if (target) target.textContent = `${prefix}${value}${suffix}`;
+}
+
+function monthsToPayoff(balance, apr, payment) {
+  const b = Math.max(0, balance);
+  const pay = Math.max(0, payment);
+  const r = Math.max(0, apr) / 100 / 12;
+  if (!b) return 0;
+  if (!pay) return 999;
+  if (r === 0) return Math.ceil(b / pay);
+  if (pay <= b * r) return 999;
+  return Math.ceil(-Math.log(1 - (b * r) / pay) / Math.log(1 + r));
+}
+
 const toolRenderers = {
   compound() {
     const controls = document.querySelector("#tool-page-controls");
     controls.innerHTML = `
-      <label>Monthly contribution <input id="p-monthly" type="range" min="25" max="1200" value="250" step="25" /></label>
-      <label>Years <input id="p-years" type="range" min="1" max="40" value="15" /></label>
-      <label>Return assumption <input id="p-rate" type="range" min="1" max="12" value="7" step="0.5" /></label>
+      ${pageControl("Starting amount", "p-start", 0, 25000, 1000, 250, "$")}
+      ${pageControl("Monthly contribution", "p-monthly", 25, 2000, 250, 25, "$")}
+      ${pageControl("Years", "p-years", 1, 40, 20, 1, "", " yrs")}
+      ${pageControl("Return assumption", "p-rate", 0, 12, 7, 0.5, "", "%")}
     `;
     const update = () => {
+      const s = Number(document.querySelector("#p-start").value);
       const m = Number(document.querySelector("#p-monthly").value);
       const y = Number(document.querySelector("#p-years").value);
-      const r = Number(document.querySelector("#p-rate").value) / 100 / 12;
+      const rate = Number(document.querySelector("#p-rate").value);
+      setPageControlValue("p-start", s, "$");
+      setPageControlValue("p-monthly", m, "$");
+      setPageControlValue("p-years", y, "", " yrs");
+      setPageControlValue("p-rate", rate, "", "%");
+      const r = rate / 100 / 12;
       const values = [5, 10, 15, 20, 30].map((year) => {
         const months = Math.min(year, y) * 12;
-        return r === 0 ? m * months : m * (((1 + r) ** months - 1) / r);
+        return s * (1 + r) ** months + (r === 0 ? m * months : m * (((1 + r) ** months - 1) / r));
       });
-      drawChart(values, ["5y", "10y", "15y", "20y", "30y"]);
-      document.querySelector("#tool-page-result").textContent = money(values[Math.min(2, values.length - 1)]);
-      document.querySelector("#tool-page-note").textContent = `${money(m * y * 12)} contributed over ${y} years`;
+      drawChart(values, ["5y", "10y", "15y", "20y", "30y"], ["#38bdf8", "#60a5fa", "#f2d990", "#22c55e", "#a78bfa"]);
+      const months = y * 12;
+      const total = s * (1 + r) ** months + (r === 0 ? m * months : m * (((1 + r) ** months - 1) / r));
+      const contributed = s + m * months;
+      document.querySelector("#tool-page-result").textContent = money(total);
+      document.querySelector("#tool-page-note").textContent = `${money(contributed)} contributed, ${money(Math.max(0, total - contributed))} estimated growth`;
     };
     controls.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
     update();
@@ -137,30 +284,45 @@ const toolRenderers = {
   credit() {
     const controls = document.querySelector("#tool-page-controls");
     controls.innerHTML = `
-      <label>Balance <input id="p-balance" type="range" min="0" max="5000" value="900" step="50" /></label>
-      <label>Limit <input id="p-limit" type="range" min="500" max="10000" value="3000" step="100" /></label>
+      ${pageControl("Balance", "p-balance", 0, 10000, 1250, 50, "$")}
+      ${pageControl("Limit", "p-limit", 500, 20000, 5000, 100, "$")}
     `;
     const update = () => {
       const balance = Number(document.querySelector("#p-balance").value);
       const limit = Number(document.querySelector("#p-limit").value);
+      setPageControlValue("p-balance", balance, "$");
+      setPageControlValue("p-limit", limit, "$");
       const pct = Math.round((balance / limit) * 100);
-      drawChart([pct, 30, 10], ["current", "30%", "10%"]);
+      drawChart([pct, 30, 10], ["current", "30%", "10%"], [pct > 30 ? "#ef4444" : pct > 10 ? "#f59e0b" : "#22c55e", "#f59e0b", "#22c55e"]);
       document.querySelector("#tool-page-result").textContent = `${pct}%`;
-      document.querySelector("#tool-page-note").textContent = `${money(balance)} balance on ${money(limit)} limit`;
+      document.querySelector("#tool-page-note").textContent = `${money(Math.max(0, balance - limit * 0.3))} to reach 30%, ${money(Math.max(0, balance - limit * 0.1))} to reach 10%`;
     };
     controls.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
     update();
   },
   budget() {
     const controls = document.querySelector("#tool-page-controls");
-    controls.innerHTML = `<label>Monthly income <input id="p-income" type="range" min="500" max="8000" value="2500" step="100" /></label>`;
+    controls.innerHTML = `
+      ${pageControl("Take-home income", "p-income", 800, 9000, 3200, 100, "$")}
+      ${pageControl("Housing", "p-housing", 0, 4000, 1100, 50, "$")}
+      ${pageControl("Food + transport", "p-basics", 0, 2500, 650, 25, "$")}
+      ${pageControl("Debt minimums", "p-budget-debt", 0, 2000, 250, 25, "$")}
+      ${pageControl("Subscriptions + fun", "p-flex", 0, 2000, 500, 25, "$")}
+    `;
     const update = () => {
       const income = Number(document.querySelector("#p-income").value);
-      drawChart([income * 0.5, income * 0.3, income * 0.2], ["needs", "wants", "save"]);
-      document.querySelector("#tool-page-result").textContent = money(income);
-      document.querySelector("#tool-page-note").textContent = "50/30/20 example split";
+      const housing = Number(document.querySelector("#p-housing").value);
+      const basics = Number(document.querySelector("#p-basics").value);
+      const debt = Number(document.querySelector("#p-budget-debt").value);
+      const flex = Number(document.querySelector("#p-flex").value);
+      ["p-income", "p-housing", "p-basics", "p-budget-debt", "p-flex"].forEach((id) => setPageControlValue(id, Number(document.querySelector(`#${id}`).value), "$"));
+      const leftover = income - housing - basics - debt - flex;
+      drawChart([housing, basics, debt, flex, Math.max(0, leftover)], ["home", "basics", "debt", "fun", "left"], ["#60a5fa", "#2dd4bf", "#fb7185", "#a78bfa", "#f2d990"]);
+      const status = leftover / Math.max(income, 1) >= 0.15 ? "Healthy" : leftover / Math.max(income, 1) >= 0.03 ? "Tight" : "Risky";
+      document.querySelector("#tool-page-result").textContent = status;
+      document.querySelector("#tool-page-note").textContent = `${money(leftover)} leftover, about ${money(Math.max(0, leftover / 4.33))}/week flexible`;
     };
-    controls.querySelector("input").addEventListener("input", update);
+    controls.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
     update();
   },
   salary() {
@@ -211,6 +373,123 @@ const toolRenderers = {
       document.querySelector("#tool-page-note").textContent = "AI should help structure the task, not make the final decision.";
     };
     controls.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
+    update();
+  },
+  emergency() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Monthly expenses <input id="p-expenses" type="range" min="500" max="6000" value="1800" step="100" /></label>
+    `;
+    const update = () => {
+      const e = Number(document.querySelector("#p-expenses").value);
+      drawChart([e, e * 3, e * 6], ["1 mo", "3 mo", "6 mo"]);
+      document.querySelector("#tool-page-result").textContent = money(e * 3);
+      document.querySelector("#tool-page-note").textContent = `3-month target based on ${money(e)}/mo expenses`;
+    };
+    controls.querySelector("input").addEventListener("input", update);
+    update();
+  },
+  debt_planner() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      ${pageControl("Balance", "p-debt-balance", 500, 30000, 6000, 250, "$")}
+      ${pageControl("APR", "p-debt-rate", 0, 36, 22, 0.5, "", "%")}
+      ${pageControl("Minimum payment", "p-debt-pay", 25, 1000, 180, 25, "$")}
+      ${pageControl("Extra payment", "p-debt-extra", 0, 1000, 100, 25, "$")}
+    `;
+    const update = () => {
+      const b = Number(document.querySelector("#p-debt-balance").value);
+      const apr = Number(document.querySelector("#p-debt-rate").value);
+      const pay = Number(document.querySelector("#p-debt-pay").value);
+      const extraPay = Number(document.querySelector("#p-debt-extra").value);
+      setPageControlValue("p-debt-balance", b, "$");
+      setPageControlValue("p-debt-rate", apr, "", "%");
+      setPageControlValue("p-debt-pay", pay, "$");
+      setPageControlValue("p-debt-extra", extraPay, "$");
+      const base = monthsToPayoff(b, apr, pay);
+      const optimized = monthsToPayoff(b, apr, pay + extraPay);
+      drawChart([Math.min(base, 120), Math.min(optimized, 120), Math.max(0, Math.min(base - optimized, 120))], ["min", "extra", "saved"], ["#fb7185", "#22c55e", "#f2d990"]);
+      document.querySelector("#tool-page-result").textContent = optimized >= 999 ? "Won't pay off" : `${optimized} months`;
+      document.querySelector("#tool-page-note").textContent = optimized < 999 && base < 999 ? `${Math.max(0, base - optimized)} months faster than minimum-only` : "Increase monthly payment above interest charge";
+    };
+    controls.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
+    update();
+  },
+  email_gen() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Your role
+        <select id="p-email-role">
+          <option value="student">College student</option>
+          <option value="recent">Recent graduate</option>
+          <option value="career">Early-career professional</option>
+        </select>
+      </label>
+      <label>Contact type
+        <select id="p-email-target">
+          <option value="analyst">Analyst / Associate</option>
+          <option value="recruiter">Recruiter</option>
+          <option value="alumni">Alumni in finance</option>
+        </select>
+      </label>
+    `;
+    const templates = {
+      analyst: {
+        student: "Hi [Name], I'm a [Year] studying [Major] at [School] and am genuinely interested in [Company]'s work in [Area]. I'd love to learn about your path into the role. Would you be open to a 15-minute call? Thanks, [Your Name]",
+        recent: "Hi [Name], I recently graduated in [Field] and am focused on [Company]'s approach to [Area]. I'd value any insight into how you approached your first year. Would a brief call work? Best, [Your Name]",
+        career: "Hi [Name], I'm currently in [Role] and following [Company]'s work closely. I'd appreciate 15 minutes to hear your perspective on [Topic]. Happy to work around your schedule. Best, [Your Name]",
+      },
+      recruiter: {
+        student: "Hi [Name], I'm a [Year] at [School] targeting finance internships for [Season]. Is [Company] recruiting for [Role]? I'd love to learn about the process. Thank you, [Your Name]",
+        recent: "Hi [Name], I'm a recent grad with [Skill] experience and strong interest in [Company]. Are there any open [Role] positions I could apply for? Thank you, [Your Name]",
+        career: "Hi [Name], I'm transitioning into [Field] with background in [Current Area]. I'd love to explore fit for any open roles at [Company]. Best, [Your Name]",
+      },
+      alumni: {
+        student: "Hi [Name], I found your profile through [School]'s alumni network. I'm studying [Major] and would value 15 minutes to hear how you broke into finance. No pressure at all. [Your Name]",
+        recent: "Hi [Name], we share [School] as alumni. I'm navigating my first year in finance and would love a quick conversation about your experience. [Your Name]",
+        career: "Hi [Name], fellow [School] grad here. I'm considering a move toward [Area] and would value your perspective given your path. [Your Name]",
+      },
+    };
+    const canvas = document.querySelector("#tool-page-chart");
+    canvas.style.display = "none";
+    const resultEl = document.querySelector("#tool-page-result");
+    const noteEl = document.querySelector("#tool-page-note");
+    const update = () => {
+      const role = document.querySelector("#p-email-role").value;
+      const target = document.querySelector("#p-email-target").value;
+      const tmpl = templates[target]?.[role] || "";
+      resultEl.textContent = "Template ready";
+      noteEl.textContent = tmpl;
+    };
+    controls.querySelectorAll("select").forEach((sel) => sel.addEventListener("change", update));
+    update();
+  },
+  invest_guide() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Your experience level
+        <select id="p-guide-level">
+          <option value="zero">Complete beginner (never invested)</option>
+          <option value="aware">Aware but haven't started yet</option>
+          <option value="some">Have a brokerage, unsure what to do</option>
+        </select>
+      </label>
+    `;
+    const paths = {
+      zero: { steps: [3, 5, 8, 10], labels: ["Step 1", "Step 2", "Step 3", "Step 4"], note: "Open account → Learn index funds → Invest $25 → Build the habit" },
+      aware: { steps: [5, 8, 10, 9], labels: ["Compare", "Open IRA", "First ETF", "Review"], note: "Compare brokerages → Open Roth IRA → Buy VTI → Set 90-day review" },
+      some: { steps: [7, 8, 10, 9], labels: ["Audit", "Automate", "Fees", "Model"], note: "Audit holdings → Automate contributions → Cut fees → Model growth" },
+    };
+    const canvas = document.querySelector("#tool-page-chart");
+    if (canvas) canvas.style.display = "block";
+    const update = () => {
+      const level = document.querySelector("#p-guide-level").value;
+      const { steps, labels, note } = paths[level];
+      drawChart(steps, labels);
+      document.querySelector("#tool-page-result").textContent = "Your roadmap";
+      document.querySelector("#tool-page-note").textContent = note;
+    };
+    controls.querySelector("select").addEventListener("change", update);
     update();
   },
 };
