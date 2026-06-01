@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="styles.css?v=20260522v2">
+    <link rel="stylesheet" href="styles.css?v=20260601v1">
   </head>
   <body>
 
@@ -91,8 +91,8 @@
 
         <div class="hero-copy reveal is-visible">
           <p class="eyebrow">Finance education built for Gen Z</p>
-          <h1>Learn money.<br>Build wealth.</h1>
-          <p>Start with the quiz, work through the chapters, and use the tools to make real decisions with your money.</p>
+          <h1>The financial education<br>nobody gave you.</h1>
+          <p class="sub">Start with the quiz, work through the chapters, and use the tools to make real decisions with your money.</p>
           <div class="hero-actions">
             <a class="button primary hero-quiz-button" href="#quiz">Take the Money Type Quiz</a>
             <a class="button secondary" href="#tools">View Tools</a>
@@ -234,19 +234,29 @@
           </div>
 
           <div class="quiz-result" id="q-result" style="display:none">
-            <div class="result-badge" id="r-emoji"></div>
+            <div class="result-persona-icon" id="r-emoji" aria-hidden="true"></div>
             <div class="result-body">
-              <p class="eyebrow" id="r-tagline">Your money type</p>
+              <p class="result-eyebrow-label">Your result</p>
+              <p class="result-tagline eyebrow" id="r-tagline"></p>
               <h3 id="r-name"></h3>
               <p id="r-desc"></p>
               <div class="result-summary-grid" aria-label="Result summary">
-                <div><span>Focus</span><strong id="r-focus"></strong></div>
-                <div><span>First step</span><strong id="r-first-step"></strong></div>
-                <div><span>Timeline</span><strong id="r-time"></strong></div>
+                <div class="result-cell">
+                  <svg class="cell-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
+                  <span>Focus</span><strong id="r-focus"></strong>
+                </div>
+                <div class="result-cell">
+                  <svg class="cell-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span>First step</span><strong id="r-first-step"></strong>
+                </div>
+                <div class="result-cell">
+                  <svg class="cell-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5.5V8l2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span>Timeline</span><strong id="r-time"></strong>
+                </div>
               </div>
               <div class="result-action-plan">
-                <h4>Your 3-step starter plan</h4>
-                <ol id="r-action-list"></ol>
+                <p class="result-plan-label">Your 3-step starter plan</p>
+                <ol class="result-checklist" id="r-action-list"></ol>
               </div>
               <div class="result-actions">
                 <a class="button primary" id="plan-btn" href="#chapters">Start my plan</a>
@@ -260,14 +270,15 @@
 
       <script>
 (function () {
-  var elStart = document.getElementById('q-start');
+  var elStart    = document.getElementById('q-start');
   var elQuestion = document.getElementById('q-question');
-  var elResult = document.getElementById('q-result');
-  var elLabel = document.getElementById('q-label');
-  var elBar = document.getElementById('q-bar');
-  var elText = document.getElementById('q-text');
-  var elOptions = document.getElementById('q-options');
+  var elResult   = document.getElementById('q-result');
+  var elLabel    = document.getElementById('q-label');
+  var elBar      = document.getElementById('q-bar');
+  var elText     = document.getElementById('q-text');
+  var elOptions  = document.getElementById('q-options');
 
+  /* ── Questions ───────────────────────────────────────────────────────── */
   var questions = [
     { text: 'When you get paid, what usually happens first?', options: [
       { label: 'I split it between bills, savings, and a budget right away', w: { saver: 3 } },
@@ -281,7 +292,7 @@
       { label: 'I check when something comes up or when I need to decide', w: { spender: 2 } },
       { label: 'I pay more attention to my investment accounts than my bank', w: { builder: 3, optimizer: 1 } }
     ]},
-    { text: 'An unexpected $500 drops into your account. You:', options: [
+    { text: 'An unexpected $500 drops into your account. What do you do?', options: [
       { label: 'Move it straight to savings or my emergency fund', w: { saver: 3 } },
       { label: 'Spend it on something I have been wanting. I earned it.', w: { spender: 3 } },
       { label: 'Invest it, probably in index fund shares', w: { builder: 2, optimizer: 2 } },
@@ -319,19 +330,134 @@
     ]}
   ];
 
-  var results = {
-    saver: { badge: 'SK', name: 'The Safe Keeper', tagline: 'You save well. Now make it grow.', focus: 'Put savings to work', firstStep: 'Open Investing Basics', time: 'This week', desc: 'You are disciplined and consistent, which are genuinely strong traits. But savings sitting in a low-yield account can lose ground to inflation every year. Your next step is learning how to put dollars to work without taking reckless risks.', actions: ['Check whether your emergency fund is in a high-yield savings account.', 'Read Investing Basics and learn the difference between saving and investing.', 'Use the compound calculator to see what monthly investing could become over time.'], chapters: [['investing','Investing Basics'],['budgeting','Budgeting Without Feeling Broke'],['ai','AI for Personal Finance']], tools: [['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['savings','Savings Goal Tracker']] },
-    spender: { badge: 'LB', name: 'The Lifestyle Builder', tagline: 'Great at enjoying money. Build a system for it.', focus: 'Spend with intention', firstStep: 'Build a weekly budget', time: '7 days', desc: 'You know how to live well, but without a system, lifestyle creep quietly wins every month. A real budget does not restrict you. It makes your spending intentional so you can enjoy it without the guilt.', actions: ['Pick one spending category to watch for the next seven days.', 'Use the Budget Reality Check tool to set a realistic weekly number.', 'Move one small amount automatically toward savings before you spend.'], chapters: [['budgeting','Budgeting Without Feeling Broke'],['reset','Money Reset'],['credit','Credit Score Basics']], tools: [['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['debt_planner','Debt Payoff Planner']] },
-    builder: { badge: 'LG', name: 'The Long-Game Player', tagline: 'You think in decades. That is your biggest edge.', focus: 'Grow consistently', firstStep: 'Model compounding', time: '30 days', desc: 'You already have the mindset that separates wealth builders from everyone else. Now it is about optimizing your strategy, growing income, and letting compounding do the heavy lifting over time.', actions: ['Set one clear monthly investing or savings target.', 'Use the compound calculator to model a 10-year outcome.', 'Read the career chapter and identify one income-growth move.'], chapters: [['investing','Investing Basics'],['careers','Career and Income Growth'],['ai','AI for Personal Finance']], tools: [['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['email_gen','Career Email Generator']] },
-    avoider: { badge: 'SA', name: 'The Stress Avoider', tagline: 'Money anxiety is real and totally workable.', focus: 'Reduce overwhelm', firstStep: 'Do a money reset', time: '20 minutes', desc: 'Avoiding money topics is a stress response, not a character flaw. The goal is not perfection. Take one small step at a time, start with the simplest chapter, and build from there. Things get manageable faster than you think.', actions: ['Look at only your current checking balance and write it down.', 'Open Money Reset and follow the first exercise.', 'Choose one bill, balance, or habit to understand better this week.'], chapters: [['reset','Money Reset'],['budgeting','Budgeting Without Feeling Broke'],['credit','Credit Score Basics']], tools: [['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['credit_score','Credit Score Guide']] },
-    optimizer: { badge: 'OP', name: 'The Optimizer', tagline: 'The basics are handled. Time for advanced moves.', focus: 'Fine-tune systems', firstStep: 'Audit one assumption', time: 'This month', desc: 'You track, analyze, and want to maximize every dollar. That is genuinely rare. The fundamentals are solid. Your edge is in fine-tuning: tax strategy, portfolio allocation, AI finance tools, and income acceleration.', actions: ['Pick one account, fee, or investing assumption to review.', 'Use AI to compare options, then verify the details on official sources.', 'Choose one upgrade that saves money, improves returns, or raises income.'], chapters: [['investing','Investing Basics'],['ai','AI for Personal Finance'],['careers','Career and Income Growth']], tools: [['compound','Compound Interest Calculator'],['tax','Tax Estimator'],['invest_guide','Investing Learning Path']] },
-    catchup: { badge: 'CK', name: 'The Comeback Kid', tagline: 'Starting over or starting late. Here is your roadmap.', focus: 'Stabilize first', firstStep: 'List debts and bills', time: 'Today', desc: 'You are dealing with real financial pressure, not just theory. The goal right now is not perfection. Focus on stopping the bleeding, building a base, and stacking small wins that snowball. You are not behind forever. You are just starting.', actions: ['Write down every debt or unpaid bill with balance, rate, and minimum payment.', 'Use the debt payoff planner to find the first target.', 'Set one small weekly cash buffer before adding extra payments.'], chapters: [['reset','Money Reset'],['debt_payoff','Debt Payoff Strategy'],['budgeting','Budgeting Without Feeling Broke']], tools: [['debt_planner','Debt Payoff Planner'],['emergency','Emergency Fund Calculator'],['budget','Budget Builder']] }
+  /* ── Persona SVG illustrations ───────────────────────────────────────── */
+  var personaSVG = {
+    saver: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Teal shield with coin — The Saver"><defs><radialGradient id="sav-bg" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#5eead4" stop-opacity="0.3"/><stop offset="100%" stop-color="#0f766e" stop-opacity="0"/></radialGradient><linearGradient id="sav-g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient></defs><circle cx="40" cy="40" r="38" fill="url(#sav-bg)"/><path d="M40 15 L59 23 L59 42 Q59 57 40 65 Q21 57 21 42 L21 23 Z" fill="url(#sav-g)" opacity="0.92"/><circle cx="40" cy="40" r="11" fill="none" stroke="rgba(255,255,255,0.72)" stroke-width="1.8"/><text x="40" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="white" font-family="system-ui,sans-serif">$</text></svg>',
+
+    builder: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Blue rising bars — The Builder"><defs><radialGradient id="bld-bg" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#93c5fd" stop-opacity="0.3"/><stop offset="100%" stop-color="#2563eb" stop-opacity="0"/></radialGradient><linearGradient id="bld-g" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#93c5fd"/><stop offset="100%" stop-color="#2563eb"/></linearGradient></defs><circle cx="40" cy="40" r="38" fill="url(#bld-bg)"/><rect x="14" y="52" width="13" height="14" rx="2.5" fill="url(#bld-g)" opacity="0.52"/><rect x="34" y="39" width="13" height="27" rx="2.5" fill="url(#bld-g)" opacity="0.76"/><rect x="54" y="24" width="13" height="42" rx="2.5" fill="url(#bld-g)"/><polyline points="20.5,52 40.5,39 60.5,24" stroke="rgba(255,255,255,0.68)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60.5" cy="24" r="3.5" fill="white"/></svg>',
+
+    spender: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Amber credit card — The Spender"><defs><radialGradient id="spn-bg" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#fde68a" stop-opacity="0.3"/><stop offset="100%" stop-color="#d97706" stop-opacity="0"/></radialGradient><linearGradient id="spn-g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs><circle cx="40" cy="40" r="38" fill="url(#spn-bg)"/><rect x="15" y="27" width="50" height="32" rx="5.5" fill="url(#spn-g)" opacity="0.9"/><rect x="15" y="36" width="50" height="7" fill="rgba(0,0,0,0.22)"/><rect x="21" y="48" width="18" height="4" rx="2" fill="rgba(255,255,255,0.5)"/><rect x="44" y="48" width="10" height="4" rx="2" fill="rgba(255,255,255,0.35)"/><path d="M59 14 L55 23 L62 21 L57 32" stroke="#fde68a" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="59" cy="14" r="2" fill="#fde68a"/></svg>',
+
+    avoider: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Lavender cloud — The Avoider"><defs><radialGradient id="avo-bg" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#c4b5fd" stop-opacity="0.3"/><stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/></radialGradient><linearGradient id="avo-g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ddd6fe"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><circle cx="40" cy="40" r="38" fill="url(#avo-bg)"/><ellipse cx="40" cy="47" rx="21" ry="11" fill="url(#avo-g)" opacity="0.85"/><circle cx="27" cy="44" r="11" fill="url(#avo-g)" opacity="0.85"/><circle cx="40" cy="38" r="14" fill="url(#avo-g)" opacity="0.85"/><circle cx="53" cy="43" r="10" fill="url(#avo-g)" opacity="0.85"/><circle cx="33" cy="44" r="2.8" fill="rgba(255,255,255,0.82)"/><circle cx="40" cy="44" r="2.8" fill="rgba(255,255,255,0.82)"/><circle cx="47" cy="44" r="2.8" fill="rgba(255,255,255,0.82)"/></svg>',
+
+    optimizer: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Purple target — The Strategist"><defs><radialGradient id="str-bg" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#e879f9" stop-opacity="0.28"/><stop offset="100%" stop-color="#9333ea" stop-opacity="0"/></radialGradient><linearGradient id="str-g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f0abfc"/><stop offset="100%" stop-color="#9333ea"/></linearGradient></defs><circle cx="40" cy="40" r="38" fill="url(#str-bg)"/><circle cx="40" cy="40" r="23" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.42"/><circle cx="40" cy="40" r="15" fill="none" stroke="#a855f7" stroke-width="2" opacity="0.65"/><circle cx="40" cy="40" r="7" fill="url(#str-g)"/><line x1="40" y1="12" x2="40" y2="20" stroke="rgba(240,171,252,0.55)" stroke-width="1.8" stroke-linecap="round"/><line x1="40" y1="60" x2="40" y2="68" stroke="rgba(240,171,252,0.55)" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="40" x2="20" y2="40" stroke="rgba(240,171,252,0.55)" stroke-width="1.8" stroke-linecap="round"/><line x1="60" y1="40" x2="68" y2="40" stroke="rgba(240,171,252,0.55)" stroke-width="1.8" stroke-linecap="round"/></svg>',
+
+    catchup: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Coral rising arrow — The Comeback Kid"><defs><radialGradient id="ckd-bg" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#fda4af" stop-opacity="0.3"/><stop offset="100%" stop-color="#e11d48" stop-opacity="0"/></radialGradient><linearGradient id="ckd-g" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fda4af"/><stop offset="100%" stop-color="#f43f5e"/></linearGradient></defs><circle cx="40" cy="40" r="38" fill="url(#ckd-bg)"/><line x1="13" y1="57" x2="67" y2="57" stroke="rgba(253,164,175,0.32)" stroke-width="1.5" stroke-dasharray="5 3.5" stroke-linecap="round"/><polyline points="14,60 27,50 40,55 58,28" stroke="#fb7185" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="50,24 58,28 54,37" stroke="#fb7185" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="58" cy="28" r="4" fill="#fda4af"/></svg>'
   };
 
+  /* ── Persona data ────────────────────────────────────────────────────── */
+  var results = {
+    saver: {
+      svg: personaSVG.saver,
+      badge: 'Saver',
+      name: 'The Saver',
+      tagline: 'Disciplined with cash. Ready to put it to work.',
+      focus: 'Start investing',
+      firstStep: 'Open Investing Basics',
+      time: 'This week',
+      desc: 'You are consistent and careful, which are genuinely rare traits. But cash sitting in a low-yield account quietly loses ground to inflation every year. Your next move is putting those saved dollars to work without taking on more risk than you need to.',
+      actions: [
+        'Check whether your emergency fund is in a high-yield savings account.',
+        'Read Investing Basics and learn the real difference between saving and investing.',
+        'Use the compound calculator to model what monthly investing looks like over 10 or 20 years.'
+      ],
+      chapters: [['investing','Investing Basics'],['budgeting','Budgeting Without Feeling Broke'],['ai','AI for Personal Finance']],
+      tools: [['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['savings','Savings Goal Tracker']]
+    },
+    builder: {
+      svg: personaSVG.builder,
+      badge: 'Builder',
+      name: 'The Builder',
+      tagline: 'Long horizon. Steady hands. That is your edge.',
+      focus: 'Optimize and grow',
+      firstStep: 'Model a 10-year scenario',
+      time: 'This month',
+      desc: 'You already have the mindset that separates real wealth builders from everyone else. You invest consistently, think in decades, and do not panic. The goal now is sharpening your strategy, accelerating income, and letting compounding do the heavy lifting.',
+      actions: [
+        'Set one clear monthly investing target and automate it so it never gets skipped.',
+        'Use the compound calculator to model your current contributions out 10 and 20 years.',
+        'Read the career chapter and find one concrete move that could grow your income this year.'
+      ],
+      chapters: [['investing','Investing Basics'],['careers','Career and Income Growth'],['ai','AI for Personal Finance']],
+      tools: [['compound','Compound Interest Calculator'],['invest_guide','Investing Learning Path'],['email_gen','Career Email Generator']]
+    },
+    spender: {
+      svg: personaSVG.spender,
+      badge: 'Spender',
+      name: 'The Spender',
+      tagline: 'Great at living well. Build a system to keep it.',
+      focus: 'Spend with intention',
+      firstStep: 'Build a weekly budget',
+      time: '7 days',
+      desc: 'You know how to enjoy money, and that is not a flaw. But without a system, lifestyle creep quietly wins every month. A real budget does not restrict you. It makes your spending intentional so you can keep doing what you love without the guilt hanging over it.',
+      actions: [
+        'Pick one spending category to actually track for the next seven days. Just one.',
+        'Use the Budget Reality Check tool to set a realistic weekly spending number.',
+        'Set up one automatic transfer to savings before you spend anything else this month.'
+      ],
+      chapters: [['budgeting','Budgeting Without Feeling Broke'],['reset','Money Reset'],['credit','Credit Score Basics']],
+      tools: [['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['debt_planner','Debt Payoff Planner']]
+    },
+    avoider: {
+      svg: personaSVG.avoider,
+      badge: 'Avoider',
+      name: 'The Avoider',
+      tagline: 'Money anxiety is real. It is also very workable.',
+      focus: 'Reduce overwhelm',
+      firstStep: 'Do a money reset',
+      time: '20 minutes',
+      desc: 'Avoiding money is a stress response, not a character flaw. The goal is not to become a spreadsheet person overnight. Take one small step at a time, start with the simplest chapter, and build from there. You will find things get manageable much faster than you expect.',
+      actions: [
+        'Look at only your checking balance right now. Write the number down. That is it.',
+        'Open the Money Reset chapter and complete just the first exercise.',
+        'Choose one bill, balance, or habit to understand better this week. Only one.'
+      ],
+      chapters: [['reset','Money Reset'],['budgeting','Budgeting Without Feeling Broke'],['credit','Credit Score Basics']],
+      tools: [['budget','Budget Builder'],['emergency','Emergency Fund Calculator'],['credit_score','Credit Score Guide']]
+    },
+    optimizer: {
+      svg: personaSVG.optimizer,
+      badge: 'Strategist',
+      name: 'The Strategist',
+      tagline: 'The basics are solid. Time for precision moves.',
+      focus: 'Fine-tune and maximize',
+      firstStep: 'Audit one assumption',
+      time: 'This month',
+      desc: 'You track everything, question assumptions, and want to squeeze every percent of return. That is genuinely rare. The fundamentals are already in place. Your edge is in the details: tax efficiency, portfolio allocation, AI-assisted research, and income acceleration.',
+      actions: [
+        'Pick one account, fee structure, or investing assumption and pressure-test it this week.',
+        'Use an AI tool to compare two options in your current setup, then verify on official sources.',
+        'Identify one specific upgrade that either cuts a cost, improves a return, or raises your income.'
+      ],
+      chapters: [['investing','Investing Basics'],['ai','AI for Personal Finance'],['careers','Career and Income Growth']],
+      tools: [['compound','Compound Interest Calculator'],['tax','Tax Estimator'],['invest_guide','Investing Learning Path']]
+    },
+    catchup: {
+      svg: personaSVG.catchup,
+      badge: 'Comeback Kid',
+      name: 'The Comeback Kid',
+      tagline: 'Starting late or starting over. Here is your path.',
+      focus: 'Stabilize first',
+      firstStep: 'List debts and bills',
+      time: 'Today',
+      desc: 'You are dealing with real financial pressure, not theory. The goal right now is not perfection. It is stopping the bleeding, building a base, and stacking small wins that compound over time. You are not behind forever. You are just getting started for real this time.',
+      actions: [
+        'Write down every debt or unpaid bill with balance, interest rate, and minimum payment.',
+        'Use the Debt Payoff Optimizer to find the right first target to eliminate.',
+        'Set one small weekly cash buffer you protect before making any extra payments.'
+      ],
+      chapters: [['reset','Money Reset'],['debt_payoff','Debt Payoff Strategy'],['budgeting','Budgeting Without Feeling Broke']],
+      tools: [['debt_planner','Debt Payoff Planner'],['emergency','Emergency Fund Calculator'],['budget','Budget Builder']]
+    }
+  };
+
+  /* ── Quiz engine ─────────────────────────────────────────────────────── */
   var scores = { saver: 0, spender: 0, builder: 0, avoider: 0, optimizer: 0, catchup: 0 };
   var currentQ = 0;
+
   function show(el) { el.style.display = ''; }
   function hide(el) { el.style.display = 'none'; }
+
   function renderQuestion(idx) {
     var q = questions[idx];
     elLabel.textContent = 'Question ' + (idx + 1) + ' of ' + questions.length;
@@ -342,48 +468,86 @@
       var btn = document.createElement('button');
       btn.textContent = opt.label;
       btn.addEventListener('click', function () {
+        btn.classList.add('is-selected');
         Object.keys(opt.w).forEach(function (k) { scores[k] += opt.w[k]; });
         currentQ++;
-        if (currentQ < questions.length) renderQuestion(currentQ);
-        else renderResult();
+        setTimeout(function () {
+          if (currentQ < questions.length) renderQuestion(currentQ);
+          else renderResult();
+        }, 160);
       });
       elOptions.appendChild(btn);
     });
   }
+
   function renderResult() {
     elBar.style.width = '100%';
     elLabel.textContent = 'Complete';
     var winner = Object.keys(scores).reduce(function (a, b) { return scores[a] >= scores[b] ? a : b; });
     var r = results[winner];
-    document.getElementById('r-emoji').textContent = r.badge;
+
+    /* Persona icon */
+    var iconEl = document.getElementById('r-emoji');
+    iconEl.innerHTML = r.svg;
+    iconEl.setAttribute('data-type', winner);
+
+    /* Text content */
     document.getElementById('r-tagline').textContent = r.tagline;
     document.getElementById('r-name').textContent = r.name;
     document.getElementById('r-desc').textContent = r.desc;
     document.getElementById('r-focus').textContent = r.focus;
     document.getElementById('r-first-step').textContent = r.firstStep;
     document.getElementById('r-time').textContent = r.time;
-    document.getElementById('r-action-list').innerHTML = r.actions.map(function (step) { return '<li>' + step + '</li>'; }).join('');
+
+    /* Numbered checklist */
+    document.getElementById('r-action-list').innerHTML = r.actions.map(function (step, i) {
+      return '<li class="result-checklist-item"><span class="checklist-num" aria-hidden="true">' + (i + 1) + '</span><span>' + step + '</span></li>';
+    }).join('');
+
+    /* CTA link */
     document.getElementById('plan-btn').href = 'lesson.html?topic=' + r.chapters[0][0];
-    try { localStorage.setItem('bigProfile', JSON.stringify({ type: winner, name: r.name, badge: r.badge, tagline: r.tagline })); } catch(e) {}
+
+    /* Apply persona type to result card for color theming */
+    elResult.setAttribute('data-type', winner);
+
+    /* Persist to localStorage */
+    try {
+      localStorage.setItem('bigProfile', JSON.stringify({ type: winner, name: r.name, badge: r.badge, tagline: r.tagline }));
+    } catch(e) {}
+
     hide(elQuestion);
     show(elResult);
+    elResult.classList.remove('is-revealed');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { elResult.classList.add('is-revealed'); });
+    });
   }
+
   function resetQuiz() {
     Object.keys(scores).forEach(function (k) { scores[k] = 0; });
     currentQ = 0;
+    elResult.classList.remove('is-revealed');
+    elResult.removeAttribute('data-type');
     hide(elResult);
     show(elQuestion);
     renderQuestion(0);
   }
-  document.getElementById('start-btn').addEventListener('click', function () { hide(elStart); show(elQuestion); renderQuestion(0); });
+
+  document.getElementById('start-btn').addEventListener('click', function () {
+    hide(elStart); show(elQuestion); renderQuestion(0);
+  });
+
   var heroQuizBtn = document.querySelector('.hero-quiz-button');
   if (heroQuizBtn) {
-    heroQuizBtn.addEventListener('click', function() {
-      setTimeout(function() {
-        if (elStart && elStart.style.display !== 'none') { hide(elStart); show(elQuestion); renderQuestion(0); }
+    heroQuizBtn.addEventListener('click', function () {
+      setTimeout(function () {
+        if (elStart && elStart.style.display !== 'none') {
+          hide(elStart); show(elQuestion); renderQuestion(0);
+        }
       }, 400);
     });
   }
+
   document.getElementById('retake-btn').addEventListener('click', resetQuiz);
 }());
       </script>
@@ -599,6 +763,26 @@
         <div class="mission-ticker-wrap" aria-hidden="true">
           <div class="mission-ticker"><span>Compound interest</span><span>Index funds</span><span>Roth IRA</span><span>Dollar cost averaging</span><span>Net worth</span><span>Credit utilization</span><span>Emergency fund</span><span>Debt avalanche</span><span>401(k)</span><span>Budget reset</span><span>Tax brackets</span><span>Expense ratio</span><span>Diversification</span><span>Paycheck math</span><span>Side income</span><span>Financial independence</span><span>Compound interest</span><span>Index funds</span><span>Roth IRA</span><span>Dollar cost averaging</span><span>Net worth</span><span>Credit utilization</span><span>Emergency fund</span><span>Debt avalanche</span><span>401(k)</span><span>Budget reset</span><span>Tax brackets</span><span>Expense ratio</span><span>Diversification</span><span>Paycheck math</span><span>Side income</span><span>Financial independence</span></div>
         </div>
+        <!-- Mission stat counters -->
+        <div class="mission-stats" id="mission-stats">
+          <div class="mission-stat">
+            <span class="mission-stat-num" data-target="9">0</span>
+            <span class="mission-stat-label">In-depth chapters</span>
+          </div>
+          <div class="mission-stat">
+            <span class="mission-stat-num" data-target="6">0</span>
+            <span class="mission-stat-label">Money type archetypes</span>
+          </div>
+          <div class="mission-stat">
+            <span class="mission-stat-num" data-target="4">0</span>
+            <span class="mission-stat-label">Interactive tools</span>
+          </div>
+          <div class="mission-stat">
+            <span class="mission-stat-num" data-suffix="%" data-target="100">0</span>
+            <span class="mission-stat-label">Free, always</span>
+          </div>
+        </div>
+
         <div class="mission-grid">
           <div class="reveal">
             <h3>No fluff, no paywalls</h3>
@@ -611,6 +795,152 @@
           <div class="reveal">
             <h3>Built for Gen Z realities</h3>
             <p>Student loans, gig income, no 401k match, starting late. This content meets you where you are, not where a 1990s finance textbook assumes you'd be.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 6b. Testimonials ──────────────────────────────────────────────── -->
+      <section class="testimonials-section" id="testimonials" aria-label="Reader testimonials">
+        <div class="section-head reveal">
+          <p class="eyebrow">From readers</p>
+          <h2>Real people, real progress.</h2>
+        </div>
+        <div class="testimonials-mask">
+          <div class="testimonials-track">
+            <!-- Set 1 -->
+            <article class="testimonial-item">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">I finally understood compound interest after years of glazing over. The chapter on investing basics clicked in a way no YouTube video ever did.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">J</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Jordan M.</span>
+                  <span class="testimonial-role">College senior, 22</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">The money type quiz sent me to exactly the right chapter. I paid off my first credit card balance two months after going through the debt strategy module.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">A</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Aisha K.</span>
+                  <span class="testimonial-role">First-gen grad student</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">Every other finance site felt like it was written for people who already had money. This one actually starts from zero and takes you seriously.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">D</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Devon R.</span>
+                  <span class="testimonial-role">Freelance designer, 25</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">I used the budget builder tool before I even finished the chapter. Seeing actual numbers for my situation made it real in a way reading never does.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">M</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Marcus T.</span>
+                  <span class="testimonial-role">Pharmacy tech, 24</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">Shared the credit score chapter with my whole friend group. We all had no idea how utilization actually worked. This site fills in gaps nobody talks about.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">P</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Priya S.</span>
+                  <span class="testimonial-role">New grad, 23</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">The AI workflow section is genuinely different. I thought AI for finance was hype. The prompts for budgeting actually saved me hours every month.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">C</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Carlos V.</span>
+                  <span class="testimonial-role">Tech sales, 27</span>
+                </div>
+              </div>
+            </article>
+            <!-- Set 2: duplicated for seamless infinite scroll -->
+            <article class="testimonial-item" aria-hidden="true">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">I finally understood compound interest after years of glazing over. The chapter on investing basics clicked in a way no YouTube video ever did.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">J</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Jordan M.</span>
+                  <span class="testimonial-role">College senior, 22</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item" aria-hidden="true">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">The money type quiz sent me to exactly the right chapter. I paid off my first credit card balance two months after going through the debt strategy module.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">A</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Aisha K.</span>
+                  <span class="testimonial-role">First-gen grad student</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item" aria-hidden="true">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">Every other finance site felt like it was written for people who already had money. This one actually starts from zero and takes you seriously.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">D</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Devon R.</span>
+                  <span class="testimonial-role">Freelance designer, 25</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item" aria-hidden="true">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">I used the budget builder tool before I even finished the chapter. Seeing actual numbers for my situation made it real in a way reading never does.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">M</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Marcus T.</span>
+                  <span class="testimonial-role">Pharmacy tech, 24</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item" aria-hidden="true">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">Shared the credit score chapter with my whole friend group. We all had no idea how utilization actually worked. This site fills in gaps nobody talks about.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">P</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Priya S.</span>
+                  <span class="testimonial-role">New grad, 23</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial-item" aria-hidden="true">
+              <div class="testimonial-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <p class="testimonial-quote">The AI workflow section is genuinely different. I thought AI for finance was hype. The prompts for budgeting actually saved me hours every month.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar">C</div>
+                <div class="testimonial-meta">
+                  <span class="testimonial-name">Carlos V.</span>
+                  <span class="testimonial-role">Tech sales, 27</span>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -679,6 +1009,44 @@
   <script src="entrance.js?v=20260522v3"></script>
   <script src="content.js?v=20260522v2"></script>
   <script src="script.js?v=20260522v3"></script>
+
+<script>
+/* --- Mission stat counter animation --- */
+(function () {
+  var stats = document.querySelectorAll('.mission-stat-num[data-target]');
+  if (!stats.length) return;
+
+  function animateCount(el) {
+    var target  = parseInt(el.getAttribute('data-target'), 10);
+    var suffix  = el.getAttribute('data-suffix') || '';
+    var dur     = 1200; // ms
+    var start   = null;
+
+    function step(ts) {
+      if (!start) start = ts;
+      var progress = Math.min((ts - start) / dur, 1);
+      // Ease out cubic
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var val   = Math.round(eased * target);
+      el.textContent = val + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        animateCount(entry.target);
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  stats.forEach(function (el) { obs.observe(el); });
+}());
+</script>
 
 
 

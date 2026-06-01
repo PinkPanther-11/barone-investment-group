@@ -290,7 +290,10 @@ h1 {
   margin-bottom: 22px;
   font-size: clamp(3.3rem, 7.4vw, 7.6rem);
   line-height: 0.9;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 0;
 }
 
 h2 {
@@ -3093,6 +3096,24 @@ body.entrance-active {
 
   .quiz-result {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .result-persona-icon {
+    margin: 0 auto;
+  }
+
+  .result-body {
+    align-items: center;
+    text-align: center;
+  }
+
+  .result-action-plan {
+    text-align: left;
+  }
+
+  .result-actions {
+    justify-content: center;
   }
 
   .result-badge {
@@ -3146,3 +3167,296 @@ body.entrance-active {
     border-radius: 18px;
   }
 }
+
+/* ============================================================
+   BRAND UPGRADE — targeted premium layer
+   ============================================================ */
+
+/* --- Cormorant Garamond for all primary headings --- */
+h1,
+h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+}
+
+/* Keep sub-headings that live inside panels feeling slightly
+   lighter so they don't compete with section h2s */
+.module-card h2,
+.detail-panel h2,
+.section-head h2 {
+  font-weight: 600;
+}
+
+/* --- Chapter card: shimmer sweep + gold glow on hover --- */
+.chapter-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer layer — escapes grid flow via absolute positioning */
+.chapter-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 25%,
+    rgba(215, 181, 109, 0.07) 50%,
+    transparent 75%
+  );
+  background-size: 250% 100%;
+  background-position: -100% 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition: background-position 0s;
+}
+
+.chapter-card:hover {
+  box-shadow: 0 12px 44px rgba(215, 181, 109, 0.1);
+}
+
+.chapter-card:hover::after {
+  background-position: 200% 0;
+  transition: background-position 0.65s ease;
+}
+
+/* Chapter number: Cormorant for the decorative numeral */
+.chapter-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--gold);
+  opacity: 0.75;
+  letter-spacing: 0.02em;
+}
+
+/* --- Progress bar on chapter card hover --- */
+/* Only applies to the bar state — .is-done keeps its checkmark */
+.chapter-progress:not(.is-done) {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, var(--gold), var(--gold-2));
+  border-radius: 0 0 0 22px;
+  transition: width 420ms ease;
+  pointer-events: none;
+}
+
+.chapter-card:hover .chapter-progress:not(.is-done) {
+  width: 100%;
+}
+
+/* --- Quiz result: Cormorant type name reveal --- */
+.result-body h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.8rem, 3.8vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* --- Mission stat counter row --- */
+.mission-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--line);
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+
+.mission-stat {
+  padding: 30px 24px;
+  background: rgba(255, 255, 255, 0.025);
+  position: relative;
+  transition: background 220ms ease;
+}
+
+.mission-stat::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-2));
+  transition: width 400ms ease;
+}
+
+.mission-stat:hover::before {
+  width: 100%;
+}
+
+.mission-stat:hover {
+  background: rgba(215, 181, 109, 0.04);
+}
+
+.mission-stat-num {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 4.2vw, 3.8rem);
+  font-weight: 700;
+  color: var(--gold-2);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.mission-stat-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Mobile: collapse to 2x2 grid */
+@media (max-width: 680px) {
+  .mission-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --- Testimonials marquee section --- */
+.testimonials-section {
+  padding: clamp(52px, 6vw, 80px) 0;
+  border-top: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.testimonials-section .section-head {
+  text-align: center;
+  padding: 0 clamp(20px, 5vw, 60px);
+  margin-bottom: clamp(28px, 3.5vw, 40px);
+}
+
+.testimonials-section .section-head .eyebrow {
+  margin-bottom: 8px;
+}
+
+.testimonials-mask {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 7%,
+    black 93%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 7%,
+    black 93%,
+    transparent
+  );
+}
+
+.testimonials-track {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  animation: testi-scroll 42s linear infinite;
+}
+
+.testimonials-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes testi-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.testimonial-item {
+  flex-shrink: 0;
+  width: 300px;
+  padding: 24px 26px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(255, 255, 255, 0.02)
+  ),
+  var(--panel);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.testimonial-item:hover {
+  border-color: rgba(215, 181, 109, 0.35);
+  box-shadow: 0 8px 32px rgba(215, 181, 109, 0.07);
+}
+
+.testimonial-stars {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+
+.testimonial-stars span {
+  font-size: 0.9rem;
+  color: var(--gold);
+}
+
+.testimonial-quote {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0 0 16px;
+  font-style: italic;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.testimonial-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), rgba(215, 181, 109, 0.35));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #050505;
+  flex-shrink: 0;
+}
+
+.testimonial-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.testimonial-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+}
+
+.testimonial-role {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+/* --- Founder card: gold border + depth --- */
+.founder-card {
+  border: 1px solid rgba(215, 181, 109, 0.22);
+  background: linear-gradient(
+    135deg,
+    rgba(215, 181, 109, 0.04),
+    rgba(255, 255, 255, 0.02)
+  ),
+  var(--panel);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(

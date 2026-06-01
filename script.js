@@ -1102,24 +1102,7 @@ drawMarketCanvas();
     badge.href = '#quiz';
     badge.className = 'money-type-badge';
     badge.setAttribute('aria-label', 'Your money type: ' + p.name + '. Click to retake quiz.');
-    badge.innerHTML = '<span class="badge-emoji">' + p.emoji + '</span><span class="badge-name">' + shortName + '</span><span class="badge-retake">retake</span>';
-    document.body.appendChild(badge);
-  } catch(e) {}
-})();
-
-// ── Money type badge ─────────────────────────────────────────────────────────
-(function() {
-  try {
-    var stored = localStorage.getItem('bigProfile');
-    if (!stored) return;
-    var p = JSON.parse(stored);
-    if (!p || !p.name) return;
-    var shortName = p.name.replace(/^The\s+/, '');
-    var badge = document.createElement('a');
-    badge.href = '#quiz';
-    badge.className = 'money-type-badge';
-    badge.setAttribute('aria-label', 'Your money type: ' + p.name + '. Click to retake quiz.');
-    badge.innerHTML = '<span class="badge-emoji">' + p.emoji + '</span><span class="badge-name">' + shortName + '</span><span class="badge-retake">retake</span>';
+    badge.innerHTML = '<span class="badge-emoji">' + (p.badge || p.name.replace(/^The\s+/, '')) + '</span><span class="badge-name">' + shortName + '</span><span class="badge-retake">retake</span>';
     document.body.appendChild(badge);
   } catch(e) {}
 })();
