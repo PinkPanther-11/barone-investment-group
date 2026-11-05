@@ -3,19 +3,19 @@ const key = params.get("topic") || params.get("workflow") || params.get("tool") 
 const type = document.querySelector("[data-detail-type]")?.dataset.detailType;
 const content = window.BIG_CONTENT;
 const lessonToolMap = {
-  investing: ["compound", "budget"],
+  investing: ["compound", "roth_vs_trad", "inflation"],
   credit: ["credit"],
-  budgeting: ["budget"],
-  ai: ["budget", "compound", "credit", "debt_planner"],
-  careers: ["budget", "compound"],
+  budgeting: ["budget", "subscriptions"],
+  ai: ["finder", "budget", "compound"],
+  careers: ["paycheck", "salary", "email_gen"],
   entrepreneurship: ["budget", "compound"],
   diversification: ["compound"],
   stocks: ["compound"],
   etfs: ["compound"],
   reset: ["net_worth", "budget", "credit"],
-  debt_payoff: ["debt_planner", "budget"],
-  taxes_paychecks: ["paycheck", "roth_vs_trad", "budget"],
-  insurance_risk: ["emergency", "budget"],
+  debt_payoff: ["debt_planner", "student_loan"],
+  taxes_paychecks: ["paycheck", "roth_vs_trad"],
+  insurance_risk: ["emergency", "savings_goal"],
 };
 
 function money(value) {
@@ -155,6 +155,46 @@ function setPageMeta(title, description) {
   });
 }
 
+function renderLessonLab(toolKeys) {
+  const keys = (toolKeys && toolKeys.length ? toolKeys : []).filter((k) => toolRenderers[k] && content.tools[k]);
+  const host = document.querySelector("#detail-sections");
+  if (!keys.length || !host) return;
+  const section = document.createElement("section");
+  section.className = "lesson-lab";
+  section.id = "lesson-lab";
+  section.innerHTML = `
+    <p class="panel-label">Try it now</p>
+    <h2>Run your own numbers</h2>
+    <div class="lab-tabs" role="tablist" aria-label="Choose a tool">${keys.map((k, i) => `<button type="button" role="tab" class="lab-tab" data-tool="${k}" aria-selected="${i === 0}">${content.tools[k].title}</button>`).join("")}</div>
+    <p id="lab-summary" class="kc-sub"></p>
+    <div class="lab-grid">
+      <div id="tool-page-controls"></div>
+      <div>
+        <canvas id="tool-page-chart" width="760" height="360"></canvas>
+        <div class="result-box"><span>Current result</span><strong id="tool-page-result">$0</strong><small id="tool-page-note">Adjust inputs to update the chart.</small></div>
+      </div>
+    </div>
+    <a class="lab-open" id="lab-open" href="#">Open the full page &rarr;</a>`;
+  const cards = host.querySelectorAll(".module-lesson-card");
+  const anchor = cards[1] || cards[cards.length - 1];
+  if (anchor && anchor.nextSibling) host.insertBefore(section, anchor.nextSibling);
+  else host.appendChild(section);
+  const show = (k) => {
+    const controls = section.querySelector("#tool-page-controls");
+    controls.innerHTML = "";
+    section.querySelector("#tool-page-chart").style.display = "block";
+    section.querySelectorAll(".lab-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tool === k)));
+    section.querySelector("#lab-summary").textContent = content.tools[k].summary;
+    section.querySelector("#lab-open").href = `tool.html?tool=${k}`;
+    toolRenderers[k]();
+  };
+  section.querySelector(".lab-tabs").addEventListener("click", (e) => {
+    const b = e.target.closest(".lab-tab");
+    if (b) show(b.dataset.tool);
+  });
+  show(keys[0]);
+}
+
 function renderKnowledgeCheck(chapterKey) {
   const qs = window.BIG_CHECKS?.[chapterKey];
   const host = document.querySelector(".module-main");
@@ -261,8 +301,9 @@ function renderLesson() {
     .join("");
   document.querySelector("#detail-checklist").innerHTML = list(item.checklist);
   document.querySelector("#detail-prompt").textContent = item.prompt;
-  renderLessonTools(key, item.tools);
   renderApps(item.apps);
+  renderLessonLab(item.tools && item.tools.length ? item.tools : lessonToolMap[key] || []);
+  { const old = document.querySelector("#chapter-tools"); if (old) old.hidden = true; }
   renderKnowledgeCheck(key);
 
   // Next chapter guide path
@@ -886,12 +927,6 @@ const toolRenderers = {
     update();
   },
   paycheck() {
-    // 2026 U.S. federal figures (estimates). Standard deduction + brackets by filing status.
-    const FED = {
-      single: { std: 16100, brackets: [[12400, 0.10], [50400, 0.12], [105700, 0.22], [201775, 0.24], [256225, 0.32], [640600, 0.35], [Infinity, 0.37]] },
-      married: { std: 32200, brackets: [[24800, 0.10], [100800, 0.12], [211400, 0.22], [403550, 0.24], [512450, 0.32], [768700, 0.35], [Infinity, 0.37]] },
-    };
-    const SS_WAGE_BASE = 184500;
     const controls = document.querySelector("#tool-page-controls");
     const stateList = window.STATE_TAX || {};
     controls.innerHTML = `
@@ -935,15 +970,6 @@ const toolRenderers = {
     if (stateList[urlState]) pickState(urlState, true);
     document.querySelector("#p-pay-state-pick").addEventListener("change", (e) => { if (e.target.value) pickState(e.target.value, false); });
     document.querySelector("#p-pay-state").addEventListener("input", () => { document.querySelector("#p-pay-state-pick").value = ""; });
-    const fedTax = (taxable, status) => {
-      let tax = 0, prev = 0;
-      for (const [cap, rate] of FED[status].brackets) {
-        if (taxable <= prev) break;
-        tax += (Math.min(taxable, cap) - prev) * rate;
-        prev = cap;
-      }
-      return tax;
-    };
     const update = () => {
       const status = document.querySelector("#p-pay-status").value;
       const periods = Number(document.querySelector("#p-pay-freq").value);
@@ -953,11 +979,7 @@ const toolRenderers = {
       setPageControlValue("p-pay-salary", gross, "$");
       setPageControlValue("p-pay-401k", k, "", "%");
       setPageControlValue("p-pay-state", st, "", "%");
-      const pretax = gross * (k / 100);
-      const fed = fedTax(Math.max(0, gross - pretax - FED[status].std), status);
-      const fica = Math.min(gross, SS_WAGE_BASE) * 0.062 + gross * 0.0145;
-      const state = Math.max(0, gross - pretax) * (st / 100);
-      const net = gross - pretax - fed - fica - state;
+      const { pretax, fed, fica, state, net } = window.BIG_CALC.paycheck({ gross, status, k401: k, stateRate: st });
       const canvas = document.querySelector("#tool-page-chart");
       canvas.style.display = "block";
       drawChart([net, fed, fica, state, pretax], ["take-home", "federal", "FICA", "state", "401k"], ["#22c55e", "#fb7185", "#f59e0b", "#a78bfa", "#60a5fa"]);

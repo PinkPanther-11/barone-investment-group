@@ -106,6 +106,43 @@
           </div>
         </div>
 
+        <div class="hero-lab reveal is-visible" id="hero-lab" aria-label="Live take-home pay calculator">
+          <div class="hl-head">
+            <span class="eyebrow">Try it now</span>
+            <strong>What does your salary really pay?</strong>
+          </div>
+          <div class="hl-grid">
+            <div class="hl-controls">
+              <label>Salary <output id="hl-salary-v">$65,000</output>
+                <input id="hl-salary" type="range" min="20000" max="250000" step="1000" value="65000" /></label>
+              <label>401(k) saved <output id="hl-401k-v">5%</output>
+                <input id="hl-401k" type="range" min="0" max="25" step="1" value="5" /></label>
+              <label>State
+                <select id="hl-state"><option value="">No state tax / not sure</option></select></label>
+            </div>
+            <div class="hl-out">
+              <span class="hl-label">Take-home per paycheck (every two weeks)</span>
+              <strong class="hl-net" id="hl-net">$0</strong>
+              <small id="hl-month"></small>
+              <div class="hl-bar" id="hl-bar" role="img" aria-label="Breakdown of salary into take-home, taxes and 401(k)"></div>
+              <ul class="hl-legend" id="hl-legend"></ul>
+            </div>
+          </div>
+          <div class="hl-foot">
+            <a id="hl-open" href="tool.html?tool=paycheck">Open the full paycheck tool &rarr;</a>
+            <span>Single filer, 2026 estimate. Educational only.</span>
+          </div>
+        </div>
+        <nav class="hero-jump" aria-label="Jump to a tool">
+          <span>Or jump straight to:</span>
+          <a href="tool.html?tool=budget">Budget check</a>
+          <a href="tool.html?tool=student_loan">Student loans</a>
+          <a href="tool.html?tool=savings_goal">Savings goal</a>
+          <a href="tool.html?tool=roth_vs_trad">Roth vs. Traditional</a>
+          <a href="tool.html?tool=net_worth">Net worth</a>
+          <a href="#tool-hub">All tools</a>
+        </nav>
+
         <script>
 (function () {
   var canvas = document.getElementById('hero-particle-canvas');
@@ -739,21 +776,19 @@
 
           </div><!-- /.tool-grid -->
 
-          <div class="more-tools" aria-label="More tools">
-            <p class="panel-label">More full tools</p>
-            <div class="more-tools-grid">
-              <a class="lesson-tool-card" href="tool.html?tool=inflation"><span>Investing</span><strong>Inflation and Rule of 72</strong><p>What your money buys later and how fast it doubles.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=retirement_number"><span>Retirement</span><strong>Retirement Number</strong><p>The nest egg you need and the monthly amount to reach it.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=car_afford"><span>Budget</span><strong>Car Affordability Check</strong><p>Loan, insurance, gas, and upkeep as a share of take-home.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=subscriptions"><span>Budget</span><strong>Subscription Audit</strong><p>Find the yearly cost and what cutting subscriptions saves.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=student_loan"><span>Debt</span><strong>Student Loan Payoff Planner</strong><p>Monthly payment, total interest, and what extra payments save.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=paycheck"><span>Taxes</span><strong>Take-Home Pay Estimator</strong><p>Salary to paycheck after federal tax, FICA, state tax, and 401(k).</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=roth_vs_trad"><span>Retirement</span><strong>Roth vs. Traditional</strong><p>See which account wins for your tax rates and timeline.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=savings_goal"><span>Savings</span><strong>Savings Goal Timeline</strong><p>How long a goal takes, with interest included.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=net_worth"><span>Reset</span><strong>Net Worth Tracker</strong><p>Assets minus debts. Saved only in your browser.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=emergency"><span>Safety net</span><strong>Emergency Fund Calculator</strong><p>1-, 3-, and 6-month cushion targets.</p><small>Open tool</small></a>
-              <a class="lesson-tool-card" href="tool.html?tool=salary"><span>Income</span><strong>Salary Breakdown</strong><p>Annual pay to monthly, weekly, and hourly.</p><small>Open tool</small></a>
+          <div class="tool-hub" id="tool-hub" aria-label="All tools">
+            <div class="hub-head">
+              <div>
+                <p class="panel-label">Every tool</p>
+                <h3>Find the right calculator.</h3>
+              </div>
+              <label class="hub-search-wrap"><span class="visually-hidden" style="position:absolute;left:-9999px">Search tools</span>
+                <input id="hub-search" type="search" placeholder="Search tools: paycheck, loan, Roth…" autocomplete="off" /></label>
             </div>
+            <div class="hub-chips" id="hub-chips" role="group" aria-label="Filter tools by category"></div>
+            <p class="hub-count" id="hub-count" aria-live="polite"></p>
+            <div class="hub-grid" id="hub-grid"></div>
+            <p class="hub-empty" id="hub-empty" hidden>No tools match that search.</p>
           </div>
 
           <!-- Tool preview panel -->
@@ -924,8 +959,13 @@
     </main>
 
   <script src="entrance.js?v=20260522v3"></script>
+  <script src="calc.js?v=20261105v4"></script>
+  <script src="states.js?v=20261105v4"></script>
+  <script src="tools-meta.js?v=20261105v4"></script>
   <script src="content.js?v=20261105v4"></script>
   <script src="script.js?v=20260522v3"></script>
+  <script src="home-tools.js?v=20261105v4"></script>
+  <script src="quick.js?v=20261105v4"></script>
 
 <script>
 /* --- Mission stat counter animation --- */
