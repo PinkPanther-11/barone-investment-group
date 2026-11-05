@@ -142,6 +142,19 @@ function missing() {
   document.querySelector("#detail-summary").textContent = "This topic is not available yet.";
 }
 
+function setPageMeta(title, description) {
+  const text = String(description || "").replace(/\s+/g, " ").trim().slice(0, 158);
+  let tag = document.querySelector('meta[name="description"]');
+  if (!tag) { tag = document.createElement("meta"); tag.name = "description"; document.head.appendChild(tag); }
+  if (text) tag.content = text;
+  [["og:title", title], ["og:description", text]].forEach(([prop, val]) => {
+    if (!val) return;
+    let m = document.querySelector(`meta[property="${prop}"]`);
+    if (!m) { m = document.createElement("meta"); m.setAttribute("property", prop); document.head.appendChild(m); }
+    m.content = val;
+  });
+}
+
 function renderKnowledgeCheck(chapterKey) {
   const qs = window.BIG_CHECKS?.[chapterKey];
   const host = document.querySelector(".module-main");
@@ -214,6 +227,7 @@ function renderLesson() {
     if (!done.includes(key)) { done.push(key); localStorage.setItem('completedChapters', JSON.stringify(done)); }
   } catch(e) {}
   document.title = `${item.title} | Barone Investment Group`;
+  setPageMeta(document.title, item.summary);
   document.querySelector("#detail-eyebrow").textContent = item.eyebrow;
   document.querySelector("#detail-title").textContent = item.title;
   document.querySelector("#detail-summary").textContent = item.summary;
@@ -388,6 +402,7 @@ function renderWorkflow() {
   const item = content.workflows[key];
   if (!item) return missing();
   document.title = `${item.title} | Barone Investment Group`;
+  setPageMeta(document.title, item.summary);
   document.querySelector("#detail-title").textContent = item.title;
   document.querySelector("#detail-summary").textContent = item.summary;
   document.querySelector("#workflow-steps").innerHTML = list(item.steps);
@@ -1045,6 +1060,7 @@ function renderTool() {
   const item = content.tools[key];
   if (!item) return missing();
   document.title = `${item.title} | Barone Investment Group`;
+  setPageMeta(document.title, item.summary);
   document.querySelector("#detail-title").textContent = item.title;
   document.querySelector("#detail-summary").textContent = item.summary;
   document.querySelector("#tool-inputs").innerHTML = list(item.inputs);

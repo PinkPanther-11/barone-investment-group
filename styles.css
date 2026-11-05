@@ -3571,3 +3571,8 @@ h2 {
 .sub-row { display: grid; grid-template-columns: 1fr 100px auto; gap: 8px; align-items: center; margin-bottom: 8px; }
 .sub-row input[type=text], .sub-row input[type=number] { min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: inherit; font: inherit; }
 .sub-keep { display: flex; align-items: center; gap: 6px; font-size: .9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .ticker-track, .testimonials-track, .marquee-track { animation: none !important; }
+}
