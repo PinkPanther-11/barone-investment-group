@@ -7,22 +7,22 @@
 
     <!-- Open Graph / social sharing -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://baroneinvestmentgroup.site/">
+    <meta property="og:url" content="https://www.baroneinvestment.site/">
     <meta property="og:title" content="Barone Investment Group | AI Finance Education for Gen Z">
     <meta property="og:description" content="Practical AI finance workflows, interactive chapters, and smart tools for Gen Z students and young professionals.">
-    <meta property="og:image" content="https://baroneinvestmentgroup.site/og-image.png">
+    <meta property="og:image" content="https://www.baroneinvestment.site/og-image.png">
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Barone Investment Group | AI Finance Education for Gen Z">
     <meta name="twitter:description" content="Practical AI finance workflows, interactive chapters, and smart tools for Gen Z students and young professionals.">
-    <meta name="twitter:image" content="https://baroneinvestmentgroup.site/og-image.png">
+    <meta name="twitter:image" content="https://www.baroneinvestment.site/og-image.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="styles.css?v=20260608v2">
+    <link rel="stylesheet" href="styles.css?v=20261105v1">
   </head>
   <body>
 
@@ -580,6 +580,13 @@
           <p>Nine chapters built for Gen Z. Each one is focused, actionable, and connects to the tools and AI workflows on this site.</p>
         </div>
 
+        <div class="progress-dash" id="progress-dash" hidden>
+          <div><strong id="pd-count">0 of 9</strong><span> chapters opened</span></div>
+          <div class="pd-bar" aria-hidden="true"><span id="pd-fill"></span></div>
+          <div id="pd-quiz"></div>
+          <a class="button primary" id="pd-next" href="lesson.html?topic=reset">Continue &rarr;</a>
+        </div>
+
         <div class="chapters-grid">
           <a class="chapter-card reveal" href="lesson.html?topic=reset">
             <span class="chapter-num">01</span>
@@ -687,7 +694,7 @@
           <p class="eyebrow">Interactive tools</p>
           <h2>Calculators and helpers for real decisions.</h2>
           <p>Click any card to preview the tool here. Each one opens a full interactive page.</p>
-          <p class="site-disclaimer">Tools are for education only. Results are estimates. not financial advice. Never enter real account numbers.</p>
+          <p class="site-disclaimer">Tools are for education only. Results are estimates, not financial advice. Never enter real account numbers.</p>
         </div>
 
         <div class="tool-layout">
@@ -729,6 +736,19 @@
             </article>
 
           </div><!-- /.tool-grid -->
+
+          <div class="more-tools" aria-label="More tools">
+            <p class="panel-label">More full tools</p>
+            <div class="more-tools-grid">
+              <a class="lesson-tool-card" href="tool.html?tool=student_loan"><span>Debt</span><strong>Student Loan Payoff Planner</strong><p>Monthly payment, total interest, and what extra payments save.</p><small>Open tool</small></a>
+              <a class="lesson-tool-card" href="tool.html?tool=paycheck"><span>Taxes</span><strong>Take-Home Pay Estimator</strong><p>Salary to paycheck after federal tax, FICA, state tax, and 401(k).</p><small>Open tool</small></a>
+              <a class="lesson-tool-card" href="tool.html?tool=roth_vs_trad"><span>Retirement</span><strong>Roth vs. Traditional</strong><p>See which account wins for your tax rates and timeline.</p><small>Open tool</small></a>
+              <a class="lesson-tool-card" href="tool.html?tool=savings_goal"><span>Savings</span><strong>Savings Goal Timeline</strong><p>How long a goal takes, with interest included.</p><small>Open tool</small></a>
+              <a class="lesson-tool-card" href="tool.html?tool=net_worth"><span>Reset</span><strong>Net Worth Tracker</strong><p>Assets minus debts. Saved only in your browser.</p><small>Open tool</small></a>
+              <a class="lesson-tool-card" href="tool.html?tool=emergency"><span>Safety net</span><strong>Emergency Fund Calculator</strong><p>1-, 3-, and 6-month cushion targets.</p><small>Open tool</small></a>
+              <a class="lesson-tool-card" href="tool.html?tool=salary"><span>Income</span><strong>Salary Breakdown</strong><p>Annual pay to monthly, weekly, and hourly.</p><small>Open tool</small></a>
+            </div>
+          </div>
 
           <!-- Tool preview panel -->
           <div class="tool-panel" id="tool-panel">
@@ -977,8 +997,8 @@
           <div class="founder-text">
             <p class="eyebrow">From the founder</p>
             <h2>I built this because nobody taught me this stuff either.</h2>
-            <p>I'm Ryan Barone. a finance student who spent years figuring out things that should have taken weeks. Compound interest, credit utilization, debt payoff strategy, how to actually start investing. Nobody handed me a roadmap.</p>
-            <p>Barone Investment Group is that roadmap. built for students and young professionals who want to be financially literate without wading through jargon, Reddit threads, or $400 courses.</p>
+            <p>I'm Ryan Barone, a finance student who spent years figuring out things that should have taken weeks. Compound interest, credit utilization, debt payoff strategy, how to actually start investing. Nobody handed me a roadmap.</p>
+            <p>Barone Investment Group is that roadmap, built for students and young professionals who want to be financially literate without wading through jargon, Reddit threads, or $400 courses.</p>
             <p>Everything here is free. Everything is practical. And everything connects to AI tools that make the learning stick.</p>
             <a class="founder-linkedin" href="https://www.linkedin.com/in/ryan-barone-779047328/" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> Ryan Barone on LinkedIn</a>
           </div>
@@ -1016,6 +1036,7 @@
           <a href="#quiz">Quiz</a>
           <a href="#chapters">Chapters</a>
           <a href="#tools">Tools</a>
+          <a href="glossary.html">Glossary</a>
           <a href="#mission">About</a>
           <a href="#advice">Ask Ryan</a>
         </nav>
@@ -1027,7 +1048,7 @@
     </main>
 
   <script src="entrance.js?v=20260522v3"></script>
-  <script src="content.js?v=20260522v2"></script>
+  <script src="content.js?v=20261105v1"></script>
   <script src="script.js?v=20260522v3"></script>
 
 <script>
@@ -1088,6 +1109,27 @@
         }
       });
     }
+  } catch(e) {}
+}());
+</script>
+<script>
+(function() {
+  // Progress dashboard
+  try {
+    var order = ['reset','budgeting','credit','debt_payoff','investing','ai','careers','taxes_paychecks','insurance_risk'];
+    var done = JSON.parse(localStorage.getItem('completedChapters') || '[]').filter(function(k){return order.indexOf(k)!==-1;});
+    var scores = JSON.parse(localStorage.getItem('chapterScores') || '{}');
+    var dash = document.getElementById('progress-dash');
+    if (!dash || !done.length) return;
+    dash.hidden = false;
+    document.getElementById('pd-count').textContent = done.length + ' of ' + order.length;
+    document.getElementById('pd-fill').style.width = Math.round(done.length / order.length * 100) + '%';
+    var taken = Object.keys(scores).length;
+    var total = order.reduce(function(s,k){return s + (scores[k] || 0);}, 0);
+    document.getElementById('pd-quiz').textContent = taken ? ('Knowledge checks: ' + taken + ' taken, ' + total + '/' + (taken*4) + ' correct') : 'Take a chapter knowledge check to track your score.';
+    var next = order.filter(function(k){return done.indexOf(k)===-1;})[0];
+    var btn = document.getElementById('pd-next');
+    if (next) btn.href = 'lesson.html?topic=' + next; else { btn.textContent = 'Open the tools'; btn.href = '#tools'; }
   } catch(e) {}
 }());
 </script>

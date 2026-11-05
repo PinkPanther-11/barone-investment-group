@@ -12,10 +12,10 @@ const lessonToolMap = {
   diversification: ["compound"],
   stocks: ["compound"],
   etfs: ["compound"],
-  reset: ["budget", "credit"],
+  reset: ["net_worth", "budget", "credit"],
   debt_payoff: ["debt_planner", "budget"],
-  taxes_paychecks: ["budget"],
-  insurance_risk: ["budget"],
+  taxes_paychecks: ["paycheck", "roth_vs_trad", "budget"],
+  insurance_risk: ["emergency", "budget"],
 };
 
 function money(value) {
@@ -142,6 +142,68 @@ function missing() {
   document.querySelector("#detail-summary").textContent = "This topic is not available yet.";
 }
 
+function renderKnowledgeCheck(chapterKey) {
+  const qs = window.BIG_CHECKS?.[chapterKey];
+  const host = document.querySelector(".module-main");
+  if (!qs || !host) return;
+  let best = null;
+  try { best = (JSON.parse(localStorage.getItem("chapterScores") || "{}"))[chapterKey] ?? null; } catch (e) {}
+  const section = document.createElement("section");
+  section.className = "knowledge-check";
+  section.id = "knowledge-check";
+  section.innerHTML = `
+    <p class="panel-label">Knowledge Check</p>
+    <h2>Test what you just learned</h2>
+    <p class="kc-sub">${qs.length} questions. Instant feedback. ${best !== null ? `Your best score: <strong>${best}/${qs.length}</strong>.` : "Your best score is saved in this browser."}</p>
+    <div class="kc-list">${qs.map((item, qi) => `
+      <fieldset class="kc-q" data-qi="${qi}">
+        <legend>${qi + 1}. ${item.q}</legend>
+        ${item.o.map((opt, oi) => `<button type="button" class="kc-opt" data-oi="${oi}">${opt}</button>`).join("")}
+        <p class="kc-why" hidden></p>
+      </fieldset>`).join("")}
+    </div>
+    <div class="kc-footer"><strong id="kc-score" aria-live="polite"></strong><button type="button" class="button secondary" id="kc-reset" hidden>Retake</button></div>`;
+  host.appendChild(section);
+  const answered = new Set();
+  let correct = 0;
+  section.addEventListener("click", (e) => {
+    const btn = e.target.closest(".kc-opt");
+    if (btn) {
+      const fs = btn.closest(".kc-q");
+      const qi = Number(fs.dataset.qi);
+      if (answered.has(qi)) return;
+      answered.add(qi);
+      const item = qs[qi];
+      const picked = Number(btn.dataset.oi);
+      fs.querySelectorAll(".kc-opt").forEach((b) => {
+        b.disabled = true;
+        if (Number(b.dataset.oi) === item.a) b.classList.add("is-correct");
+      });
+      if (picked === item.a) correct += 1; else btn.classList.add("is-wrong");
+      const why = fs.querySelector(".kc-why");
+      why.textContent = (picked === item.a ? "Correct. " : "Not quite. ") + item.why;
+      why.hidden = false;
+      if (answered.size === qs.length) {
+        document.querySelector("#kc-score").textContent = `You got ${correct} of ${qs.length}. ${correct === qs.length ? "Perfect." : correct >= qs.length - 1 ? "Strong work." : "Review the lesson steps above and retake it."}`;
+        document.querySelector("#kc-reset").hidden = false;
+        try {
+          const scores = JSON.parse(localStorage.getItem("chapterScores") || "{}");
+          if (scores[chapterKey] == null || correct > scores[chapterKey]) scores[chapterKey] = correct;
+          localStorage.setItem("chapterScores", JSON.stringify(scores));
+        } catch (e2) {}
+      }
+      return;
+    }
+    if (e.target.id === "kc-reset") {
+      answered.clear(); correct = 0;
+      section.querySelectorAll(".kc-opt").forEach((b) => { b.disabled = false; b.classList.remove("is-correct", "is-wrong"); });
+      section.querySelectorAll(".kc-why").forEach((p) => { p.hidden = true; });
+      document.querySelector("#kc-score").textContent = "";
+      e.target.hidden = true;
+    }
+  });
+}
+
 function renderLesson() {
   const item = content.lessons[key];
   if (!item) return missing();
@@ -187,6 +249,7 @@ function renderLesson() {
   document.querySelector("#detail-prompt").textContent = item.prompt;
   renderLessonTools(key, item.tools);
   renderApps(item.apps);
+  renderKnowledgeCheck(key);
 
   // Next chapter guide path
   const CHAPTER_ORDER = ['reset','budgeting','credit','debt_payoff','investing','ai','careers','taxes_paychecks','insurance_risk'];
@@ -638,6 +701,220 @@ const toolRenderers = {
       document.querySelector("#tool-page-note").textContent = note;
     };
     controls.querySelector("select").addEventListener("change", update);
+    update();
+  },
+  student_loan() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      ${pageControl("Loan balance", "p-sl-bal", 1000, 200000, 30000, 1000, "$")}
+      ${pageControl("Interest rate (APR)", "p-sl-apr", 0, 15, 6.5, 0.25, "", "%")}
+      ${pageControl("Repayment term", "p-sl-term", 5, 30, 10, 1, "", " yrs")}
+      ${pageControl("Extra per month", "p-sl-extra", 0, 1000, 100, 10, "$")}
+    `;
+    const simulate = (bal, r, pay) => {
+      let months = 0, interest = 0;
+      while (bal > 0.005 && months < 1200) {
+        const i = bal * r;
+        if (pay <= i && r > 0) return null;
+        interest += i;
+        bal = bal + i - Math.min(pay, bal + i);
+        months += 1;
+      }
+      return { months, interest };
+    };
+    const update = () => {
+      const bal = Number(document.querySelector("#p-sl-bal").value);
+      const apr = Number(document.querySelector("#p-sl-apr").value);
+      const term = Number(document.querySelector("#p-sl-term").value);
+      const extra = Number(document.querySelector("#p-sl-extra").value);
+      setPageControlValue("p-sl-bal", bal, "$");
+      setPageControlValue("p-sl-apr", apr, "", "%");
+      setPageControlValue("p-sl-term", term, "", " yrs");
+      setPageControlValue("p-sl-extra", extra, "$");
+      const r = apr / 100 / 12, n = term * 12;
+      const std = r === 0 ? bal / n : (bal * r) / (1 - (1 + r) ** -n);
+      const base = simulate(bal, r, std);
+      const fast = simulate(bal, r, std + extra);
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([bal, base.interest, fast.interest], ["principal", "interest", "w/ extra"], ["#60a5fa", "#fb7185", "#22c55e"]);
+      document.querySelector("#tool-page-result").textContent = `${money(std)}/mo standard`;
+      const saved = base.interest - fast.interest;
+      const mSaved = base.months - fast.months;
+      document.querySelector("#tool-page-note").textContent = extra > 0
+        ? `Standard plan: ${money(base.interest)} total interest over ${base.months} months. Adding ${money(extra)}/mo finishes ${Math.floor(mSaved / 12)} yr ${mSaved % 12} mo sooner and saves ${money(saved)} in interest. Federal and private loan terms vary; check your servicer for exact figures.`
+        : `Standard plan: ${money(base.interest)} total interest over ${base.months} months. Move the "Extra per month" slider to see what a little more each month saves.`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    update();
+  },
+  paycheck() {
+    // 2026 U.S. federal figures (estimates). Standard deduction + brackets by filing status.
+    const FED = {
+      single: { std: 16100, brackets: [[12400, 0.10], [50400, 0.12], [105700, 0.22], [201775, 0.24], [256225, 0.32], [640600, 0.35], [Infinity, 0.37]] },
+      married: { std: 32200, brackets: [[24800, 0.10], [100800, 0.12], [211400, 0.22], [403550, 0.24], [512450, 0.32], [768700, 0.35], [Infinity, 0.37]] },
+    };
+    const SS_WAGE_BASE = 184500;
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      <label>Filing status
+        <select id="p-pay-status">
+          <option value="single">Single</option>
+          <option value="married">Married filing jointly (one income)</option>
+        </select>
+      </label>
+      <label>Pay frequency
+        <select id="p-pay-freq">
+          <option value="12">Monthly</option>
+          <option value="24">Twice a month</option>
+          <option value="26" selected>Every two weeks</option>
+          <option value="52">Weekly</option>
+        </select>
+      </label>
+      ${pageControl("Annual salary", "p-pay-salary", 20000, 250000, 65000, 1000, "$")}
+      ${pageControl("Pre-tax 401(k)", "p-pay-401k", 0, 25, 5, 1, "", "%")}
+      ${pageControl("State income tax", "p-pay-state", 0, 10, 4, 0.5, "", "%")}
+    `;
+    const fedTax = (taxable, status) => {
+      let tax = 0, prev = 0;
+      for (const [cap, rate] of FED[status].brackets) {
+        if (taxable <= prev) break;
+        tax += (Math.min(taxable, cap) - prev) * rate;
+        prev = cap;
+      }
+      return tax;
+    };
+    const update = () => {
+      const status = document.querySelector("#p-pay-status").value;
+      const periods = Number(document.querySelector("#p-pay-freq").value);
+      const gross = Number(document.querySelector("#p-pay-salary").value);
+      const k = Number(document.querySelector("#p-pay-401k").value);
+      const st = Number(document.querySelector("#p-pay-state").value);
+      setPageControlValue("p-pay-salary", gross, "$");
+      setPageControlValue("p-pay-401k", k, "", "%");
+      setPageControlValue("p-pay-state", st, "", "%");
+      const pretax = gross * (k / 100);
+      const fed = fedTax(Math.max(0, gross - pretax - FED[status].std), status);
+      const fica = Math.min(gross, SS_WAGE_BASE) * 0.062 + gross * 0.0145;
+      const state = Math.max(0, gross - pretax) * (st / 100);
+      const net = gross - pretax - fed - fica - state;
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([net, fed, fica, state, pretax], ["take-home", "federal", "FICA", "state", "401k"], ["#22c55e", "#fb7185", "#f59e0b", "#a78bfa", "#60a5fa"]);
+      document.querySelector("#tool-page-result").textContent = `${money(net / periods)} per paycheck`;
+      document.querySelector("#tool-page-note").textContent = `${money(net / 12)}/month take-home. Federal ${money(fed)}, FICA ${money(fica)}, state ${money(state)}, 401(k) ${money(pretax)} (still yours). Effective tax rate ${(((fed + fica + state) / gross) * 100).toFixed(1)}%. 2026 federal estimate only; excludes health premiums, local tax, and credits.`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    controls.querySelectorAll("select").forEach((s) => s.addEventListener("change", update));
+    update();
+  },
+  roth_vs_trad() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      ${pageControl("Pre-tax amount you'd contribute per year", "p-rt-amt", 1000, 23500, 6000, 500, "$")}
+      ${pageControl("Years until retirement", "p-rt-years", 5, 45, 35, 1, "", " yrs")}
+      ${pageControl("Return assumption", "p-rt-rate", 0, 12, 7, 0.5, "", "%")}
+      ${pageControl("Tax rate now", "p-rt-now", 0, 40, 12, 1, "", "%")}
+      ${pageControl("Tax rate in retirement", "p-rt-ret", 0, 40, 22, 1, "", "%")}
+    `;
+    const update = () => {
+      const c = Number(document.querySelector("#p-rt-amt").value);
+      const n = Number(document.querySelector("#p-rt-years").value);
+      const rate = Number(document.querySelector("#p-rt-rate").value);
+      const now = Number(document.querySelector("#p-rt-now").value);
+      const ret = Number(document.querySelector("#p-rt-ret").value);
+      setPageControlValue("p-rt-amt", c, "$");
+      setPageControlValue("p-rt-years", n, "", " yrs");
+      setPageControlValue("p-rt-rate", rate, "", "%");
+      setPageControlValue("p-rt-now", now, "", "%");
+      setPageControlValue("p-rt-ret", ret, "", "%");
+      const r = rate / 100;
+      const growth = r === 0 ? n : ((1 + r) ** n - 1) / r;
+      // Same take-home cost: Traditional invests the full pre-tax amount, Roth invests what is left after tax.
+      const tradAfterTax = c * growth * (1 - ret / 100);
+      const rothAfterTax = c * (1 - now / 100) * growth;
+      const diff = Math.abs(rothAfterTax - tradAfterTax);
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([tradAfterTax, rothAfterTax], ["Traditional", "Roth"], ["#60a5fa", "#f2d990"]);
+      const winner = diff < 1 ? "It's a tie" : rothAfterTax > tradAfterTax ? "Roth wins" : "Traditional wins";
+      document.querySelector("#tool-page-result").textContent = winner;
+      document.querySelector("#tool-page-note").textContent = `Traditional ${money(tradAfterTax)} vs Roth ${money(rothAfterTax)} after tax (${money(diff)} difference). Rule of thumb: lower tax rate now than in retirement favors Roth; higher now favors Traditional. Assumes the same take-home cost either way and no early withdrawals.`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    update();
+  },
+  savings_goal() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      ${pageControl("Goal amount", "p-sg-goal", 500, 100000, 10000, 500, "$")}
+      ${pageControl("Already saved", "p-sg-have", 0, 50000, 1000, 250, "$")}
+      ${pageControl("Monthly savings", "p-sg-month", 25, 3000, 300, 25, "$")}
+      ${pageControl("Savings APY", "p-sg-apy", 0, 6, 4, 0.25, "", "%")}
+    `;
+    const update = () => {
+      const goal = Number(document.querySelector("#p-sg-goal").value);
+      const have = Number(document.querySelector("#p-sg-have").value);
+      const monthly = Number(document.querySelector("#p-sg-month").value);
+      const apy = Number(document.querySelector("#p-sg-apy").value);
+      setPageControlValue("p-sg-goal", goal, "$");
+      setPageControlValue("p-sg-have", have, "$");
+      setPageControlValue("p-sg-month", monthly, "$");
+      setPageControlValue("p-sg-apy", apy, "", "%");
+      const mr = (1 + apy / 100) ** (1 / 12) - 1;
+      let bal = have, months = 0, contributed = have;
+      const path = [have];
+      while (bal < goal && months < 600) {
+        bal = bal * (1 + mr) + monthly;
+        contributed += monthly;
+        months += 1;
+        path.push(bal);
+      }
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      const pts = [0, 0.25, 0.5, 0.75, 1].map((f) => path[Math.round((path.length - 1) * f)]);
+      drawChart(pts, ["start", "25%", "50%", "75%", "goal"], ["#38bdf8", "#60a5fa", "#f2d990", "#22c55e", "#a78bfa"]);
+      const resultEl = document.querySelector("#tool-page-result");
+      const noteEl = document.querySelector("#tool-page-note");
+      if (have >= goal) {
+        resultEl.textContent = "Already there";
+        noteEl.textContent = "You have already saved at least your goal amount.";
+      } else if (months >= 600) {
+        resultEl.textContent = "50+ years";
+        noteEl.textContent = "Raise the monthly amount to make this goal realistic.";
+      } else {
+        const y = Math.floor(months / 12), m = months % 12;
+        resultEl.textContent = `${y ? y + " yr " : ""}${m} mo`;
+        noteEl.textContent = `${months} months of saving ${money(monthly)}. About ${money(Math.max(0, bal - contributed))} of the total comes from interest.`;
+      }
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    update();
+  },
+  net_worth() {
+    const fields = [
+      ["nw-cash", "Cash and savings", "asset"], ["nw-invest", "Investments (401k, IRA, brokerage)", "asset"], ["nw-other", "Other assets (car, valuables)", "asset"],
+      ["nw-student", "Student loans", "debt"], ["nw-cards", "Credit cards", "debt"], ["nw-debt", "Other debt (auto, personal)", "debt"],
+    ];
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem("netWorthInputs") || "{}"); } catch (e) {}
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = fields.map(([id, label]) => `<label>${label} ($)<input id="${id}" type="number" inputmode="decimal" min="0" step="100" value="${saved[id] ?? 0}" /></label>`).join("") +
+      `<p class="tool-hint">Saved in this browser only. Nothing is sent anywhere. Never enter account numbers.</p>`;
+    const update = () => {
+      const vals = {};
+      fields.forEach(([id]) => { vals[id] = Math.max(0, Number(document.querySelector(`#${id}`).value) || 0); });
+      try { localStorage.setItem("netWorthInputs", JSON.stringify(vals)); } catch (e) {}
+      const assets = fields.filter((f) => f[2] === "asset").reduce((s, [id]) => s + vals[id], 0);
+      const debts = fields.filter((f) => f[2] === "debt").reduce((s, [id]) => s + vals[id], 0);
+      const nw = assets - debts;
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([assets, debts, Math.max(0, nw)], ["assets", "debts", "net worth"], ["#22c55e", "#fb7185", "#f2d990"]);
+      document.querySelector("#tool-page-result").textContent = money(nw);
+      document.querySelector("#tool-page-note").textContent = `${money(assets)} owned minus ${money(debts)} owed. ${nw < 0 ? "Negative is normal early on, especially with student loans. The goal is to move it up each quarter." : "Update this every quarter and watch the trend, not the single number."}`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
     update();
   },
 };

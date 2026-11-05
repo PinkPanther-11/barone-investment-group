@@ -705,6 +705,36 @@ window.BIG_CONTENT = {
       inputs: ["Your name and school", "Their name and role", "Company name", "Your goal"],
       useCases: ["Cold outreach to analysts and recruiters", "Informational interview requests", "Follow-up after events or applications"],
     },
+    student_loan: {
+      title: "Student Loan Payoff Planner",
+      summary: "See your standard monthly payment, total interest, and how much time and money extra payments save.",
+      inputs: ["Loan balance", "Interest rate (APR)", "Repayment term", "Extra monthly payment"],
+      useCases: ["Decide whether extra payments are worth it", "Compare 10-year vs 20-year terms", "See the true cost of the interest"],
+    },
+    paycheck: {
+      title: "Take-Home Pay Estimator",
+      summary: "Turn a salary into an estimated paycheck after federal income tax, Social Security, Medicare, state tax, and 401(k).",
+      inputs: ["Annual salary", "Filing status", "Pre-tax 401(k) %", "State tax rate", "Pay frequency"],
+      useCases: ["Compare job offers", "See what a 401(k) really costs you", "Know your real monthly budget before signing a lease"],
+    },
+    roth_vs_trad: {
+      title: "Roth vs. Traditional Calculator",
+      summary: "Compare after-tax retirement income from a Roth and a Traditional account using your tax rate now and in retirement.",
+      inputs: ["Yearly contribution", "Years until retirement", "Expected return", "Tax rate now", "Tax rate in retirement"],
+      useCases: ["Pick the right account type", "See when a Roth wins", "Understand why tax rate matters"],
+    },
+    savings_goal: {
+      title: "Savings Goal Timeline",
+      summary: "Set a target (car, trip, down payment) and see how long it takes, or how much to save monthly to hit a date.",
+      inputs: ["Goal amount", "Already saved", "Monthly savings", "Savings account APY"],
+      useCases: ["Plan a down payment", "Decide if a goal date is realistic", "See what interest adds"],
+    },
+    net_worth: {
+      title: "Net Worth Tracker",
+      summary: "Add up what you own and what you owe. Saved in your browser only, never sent anywhere.",
+      inputs: ["Cash and savings", "Investments", "Other assets", "Student loans", "Credit cards", "Other debt"],
+      useCases: ["Find your starting line", "Track progress each quarter", "Complete the Money Reset chapter"],
+    },
     invest_guide: {
       title: "Investing Learning Path",
       summary: "Choose your experience level and get a personalized beginner roadmap to index investing.",

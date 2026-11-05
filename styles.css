@@ -3544,3 +3544,25 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+/* ── Knowledge checks + more tools ── */
+.more-tools { grid-column: 1 / -1; margin-top: 28px; }
+.more-tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 12px; }
+.knowledge-check { margin: 40px 0; padding: 28px; border: 1px solid rgba(215,181,109,.25); border-radius: 18px; background: rgba(255,255,255,.03); }
+.knowledge-check h2 { margin: 6px 0 4px; }
+.kc-sub { color: rgba(255,255,255,.7); margin-bottom: 18px; }
+.kc-q { border: 0; padding: 0; margin: 0 0 22px; display: grid; gap: 8px; }
+.kc-q legend { font-weight: 600; margin-bottom: 10px; padding: 0; }
+.kc-opt { text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.04); color: inherit; font: inherit; cursor: pointer; transition: border-color .15s, background .15s; }
+.kc-opt:hover:not(:disabled) { border-color: rgba(215,181,109,.7); background: rgba(215,181,109,.08); }
+.kc-opt:focus-visible { outline: 2px solid #d7b56d; outline-offset: 2px; }
+.kc-opt:disabled { cursor: default; color: inherit; opacity: .75; }
+.kc-opt.is-correct { border-color: #22c55e; background: rgba(34,197,94,.14); opacity: 1; }
+.kc-opt.is-wrong { border-color: #fb7185; background: rgba(251,113,133,.14); opacity: 1; }
+.kc-why { margin: 4px 0 0; font-size: .92rem; color: rgba(255,255,255,.8); }
+.kc-footer { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.tool-hint { font-size: .85rem; color: rgba(255,255,255,.6); }
+
+.progress-dash { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 0 0 24px; padding: 16px 20px; border: 1px solid rgba(215,181,109,.3); border-radius: 14px; background: rgba(215,181,109,.06); }
+.progress-dash .pd-bar { flex: 1 1 140px; height: 8px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+.progress-dash .pd-bar span { display: block; height: 100%; width: 0; background: #d7b56d; transition: width .4s; }
+.progress-dash span, .progress-dash #pd-quiz { color: rgba(255,255,255,.75); font-size: .92rem; }
