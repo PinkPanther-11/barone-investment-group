@@ -703,6 +703,128 @@ const toolRenderers = {
     controls.querySelector("select").addEventListener("change", update);
     update();
   },
+  inflation() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      ${pageControl("Amount today", "p-in-amt", 100, 50000, 1000, 100, "$")}
+      ${pageControl("Years", "p-in-years", 1, 50, 20, 1, "", " yrs")}
+      ${pageControl("Inflation rate", "p-in-inf", 0, 10, 3, 0.5, "", "%")}
+      ${pageControl("Investment return", "p-in-ret", 0, 12, 7, 0.5, "", "%")}
+    `;
+    const update = () => {
+      const amt = Number(document.querySelector("#p-in-amt").value);
+      const y = Number(document.querySelector("#p-in-years").value);
+      const inf = Number(document.querySelector("#p-in-inf").value);
+      const ret = Number(document.querySelector("#p-in-ret").value);
+      setPageControlValue("p-in-amt", amt, "$");
+      setPageControlValue("p-in-years", y, "", " yrs");
+      setPageControlValue("p-in-inf", inf, "", "%");
+      setPageControlValue("p-in-ret", ret, "", "%");
+      const cashPower = amt / (1 + inf / 100) ** y;
+      const investedReal = amt * ((1 + ret / 100) / (1 + inf / 100)) ** y;
+      const double = ret > 0 ? 72 / ret : null;
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([amt, cashPower, investedReal], ["today", "cash", "invested"], ["#60a5fa", "#fb7185", "#22c55e"]);
+      document.querySelector("#tool-page-result").textContent = `${money(cashPower)} buying power`;
+      document.querySelector("#tool-page-note").textContent = `${money(amt)} kept as cash buys only what ${money(cashPower)} buys today after ${y} years of ${inf}% inflation. Invested at ${ret}%, it is worth about ${money(investedReal)} in today's dollars. Rule of 72: money doubles about every ${double ? double.toFixed(1) : "never"} years at ${ret}%.`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    update();
+  },
+  subscriptions() {
+    let rows;
+    try { rows = JSON.parse(localStorage.getItem("subAudit") || "null"); } catch (e) { rows = null; }
+    if (!Array.isArray(rows) || !rows.length) rows = [["Streaming", 15.49, true], ["Music", 10.99, true], ["Cloud storage", 2.99, true], ["Gym", 25, true], ["", 0, true], ["", 0, true]];
+    const controls = document.querySelector("#tool-page-controls");
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    controls.innerHTML = rows.map((r, i) => `<div class="sub-row">
+      <input class="sub-name" data-i="${i}" type="text" placeholder="Subscription" value="${esc(r[0])}" aria-label="Subscription name ${i + 1}" />
+      <input class="sub-cost" data-i="${i}" type="number" min="0" step="0.01" inputmode="decimal" value="${r[1]}" aria-label="Monthly cost ${i + 1}" />
+      <label class="sub-keep"><input type="checkbox" data-i="${i}" ${r[2] ? "checked" : ""} /> keep</label>
+    </div>`).join("") + `<p class="tool-hint">Uncheck "keep" for anything you would cancel. Saved in this browser only.</p>`;
+    const update = () => {
+      const next = rows.map((_, i) => [
+        controls.querySelector(`.sub-name[data-i="${i}"]`).value,
+        Math.max(0, Number(controls.querySelector(`.sub-cost[data-i="${i}"]`).value) || 0),
+        controls.querySelector(`input[type=checkbox][data-i="${i}"]`).checked,
+      ]);
+      try { localStorage.setItem("subAudit", JSON.stringify(next)); } catch (e) {}
+      const total = next.reduce((s, r) => s + r[1], 0);
+      const cut = next.filter((r) => !r[2]).reduce((s, r) => s + r[1], 0);
+      const r = 0.07 / 12, n = 120;
+      const grown = cut * (((1 + r) ** n - 1) / r);
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([total * 12, (total - cut) * 12, cut * 12], ["per year", "keeping", "saved"], ["#fb7185", "#60a5fa", "#22c55e"]);
+      document.querySelector("#tool-page-result").textContent = `${money(cut * 12)}/yr saved`;
+      document.querySelector("#tool-page-note").textContent = `All subscriptions cost ${money(total)}/month (${money(total * 12)}/year). Cutting the unchecked ones saves ${money(cut)}/month. Invested at 7% for 10 years, that could grow to about ${money(grown)}. Illustrative only.`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    controls.querySelectorAll("input[type=checkbox]").forEach((i) => i.addEventListener("change", update));
+    update();
+  },
+  car_afford() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      ${pageControl("Monthly take-home pay", "p-car-inc", 1500, 12000, 3500, 100, "$")}
+      ${pageControl("Car price", "p-car-price", 3000, 80000, 22000, 500, "$")}
+      ${pageControl("Down payment", "p-car-down", 0, 30000, 3000, 500, "$")}
+      ${pageControl("Loan rate (APR)", "p-car-apr", 0, 15, 7, 0.25, "", "%")}
+      ${pageControl("Loan term", "p-car-term", 24, 84, 60, 12, "", " mo")}
+      ${pageControl("Insurance + gas + upkeep", "p-car-run", 100, 1200, 400, 25, "$")}
+    `;
+    const update = () => {
+      const g = (id) => Number(document.querySelector(`#${id}`).value);
+      const inc = g("p-car-inc"), price = g("p-car-price"), down = Math.min(g("p-car-down"), g("p-car-price")), apr = g("p-car-apr"), term = g("p-car-term"), run = g("p-car-run");
+      setPageControlValue("p-car-inc", inc, "$"); setPageControlValue("p-car-price", price, "$"); setPageControlValue("p-car-down", g("p-car-down"), "$");
+      setPageControlValue("p-car-apr", apr, "", "%"); setPageControlValue("p-car-term", term, "", " mo"); setPageControlValue("p-car-run", run, "$");
+      const loan = price - down, r = apr / 100 / 12;
+      const pay = loan <= 0 ? 0 : r === 0 ? loan / term : (loan * r) / (1 - (1 + r) ** -term);
+      const monthly = pay + run;
+      const pct = (monthly / inc) * 100;
+      const totalCost = pay * term + down + run * term;
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([pay, run, Math.max(0, inc * 0.15 - monthly)], ["loan", "running", "room"], ["#60a5fa", "#f59e0b", "#22c55e"]);
+      const verdict = pct <= 15 ? "Comfortable" : pct <= 20 ? "Stretching" : "Too much";
+      document.querySelector("#tool-page-result").textContent = `${verdict}: ${pct.toFixed(0)}% of take-home`;
+      document.querySelector("#tool-page-note").textContent = `${money(pay)} loan payment + ${money(run)} running costs = ${money(monthly)}/month. Total cost over the loan: about ${money(totalCost)}. A common guideline is to keep all car costs near 15% of take-home pay (20% at most).`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    update();
+  },
+  retirement_number() {
+    const controls = document.querySelector("#tool-page-controls");
+    controls.innerHTML = `
+      ${pageControl("Current age", "p-rn-age", 16, 60, 22, 1)}
+      ${pageControl("Retirement age", "p-rn-ret", 50, 75, 65, 1)}
+      ${pageControl("Monthly spending in retirement (today's $)", "p-rn-spend", 1000, 10000, 4000, 250, "$")}
+      ${pageControl("Saved so far", "p-rn-have", 0, 200000, 0, 1000, "$")}
+      ${pageControl("Return before retirement", "p-rn-r", 0, 12, 7, 0.5, "", "%")}
+      ${pageControl("Inflation", "p-rn-inf", 0, 8, 3, 0.5, "", "%")}
+    `;
+    const update = () => {
+      const g = (id) => Number(document.querySelector(`#${id}`).value);
+      const age = g("p-rn-age"), ret = Math.max(g("p-rn-ret"), age + 1), spend = g("p-rn-spend"), have = g("p-rn-have"), rr = g("p-rn-r") / 100, inf = g("p-rn-inf") / 100;
+      setPageControlValue("p-rn-age", age); setPageControlValue("p-rn-ret", g("p-rn-ret")); setPageControlValue("p-rn-spend", spend, "$");
+      setPageControlValue("p-rn-have", have, "$"); setPageControlValue("p-rn-r", g("p-rn-r"), "", "%"); setPageControlValue("p-rn-inf", g("p-rn-inf"), "", "%");
+      const years = ret - age;
+      const futureSpend = spend * 12 * (1 + inf) ** years;
+      const target = futureSpend / 0.04; // 4% rule of thumb
+      const mr = rr / 12, n = years * 12;
+      const haveGrown = have * (1 + mr) ** n;
+      const gap = Math.max(0, target - haveGrown);
+      const monthly = gap === 0 ? 0 : mr === 0 ? gap / n : (gap * mr) / ((1 + mr) ** n - 1);
+      const canvas = document.querySelector("#tool-page-chart");
+      canvas.style.display = "block";
+      drawChart([target, haveGrown, gap], ["target", "savings", "gap"], ["#f2d990", "#22c55e", "#fb7185"]);
+      document.querySelector("#tool-page-result").textContent = `${money(monthly)}/mo to save`;
+      document.querySelector("#tool-page-note").textContent = `Target nest egg about ${money(target)} at age ${ret} (spending ${money(futureSpend / 12)}/month after ${years} years of inflation, using the common 4% withdrawal guideline). Your current savings could grow to ${money(haveGrown)}. Estimates only; Social Security and taxes are not included.`;
+    };
+    controls.querySelectorAll("input").forEach((i) => i.addEventListener("input", update));
+    update();
+  },
   student_loan() {
     const controls = document.querySelector("#tool-page-controls");
     controls.innerHTML = `

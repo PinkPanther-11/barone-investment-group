@@ -3566,3 +3566,8 @@ h2 {
 .progress-dash .pd-bar { flex: 1 1 140px; height: 8px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
 .progress-dash .pd-bar span { display: block; height: 100%; width: 0; background: #d7b56d; transition: width .4s; }
 .progress-dash span, .progress-dash #pd-quiz { color: rgba(255,255,255,.75); font-size: .92rem; }
+.honest-cta { margin-top: 22px; text-align: center; color: rgba(255,255,255,.8); }
+.honest-cta a { color: #d7b56d; }
+.sub-row { display: grid; grid-template-columns: 1fr 100px auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+.sub-row input[type=text], .sub-row input[type=number] { min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: inherit; font: inherit; }
+.sub-keep { display: flex; align-items: center; gap: 6px; font-size: .9rem; }

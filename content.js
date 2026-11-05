@@ -705,6 +705,30 @@ window.BIG_CONTENT = {
       inputs: ["Your name and school", "Their name and role", "Company name", "Your goal"],
       useCases: ["Cold outreach to analysts and recruiters", "Informational interview requests", "Follow-up after events or applications"],
     },
+    inflation: {
+      title: "Inflation and Rule of 72",
+      summary: "See what your money buys in the future and how long it takes to double. Compare cash against investing after inflation.",
+      inputs: ["Amount today", "Years", "Inflation rate", "Investment return"],
+      useCases: ["Understand why cash loses value", "Estimate doubling time", "Compare saving vs. investing"],
+    },
+    subscriptions: {
+      title: "Subscription Audit",
+      summary: "List every subscription, uncheck what you would cut, and see the yearly savings and what that money could grow to.",
+      inputs: ["Subscription names", "Monthly costs", "Keep or cut"],
+      useCases: ["Find forgotten charges", "See the yearly cost", "Turn cuts into an investing plan"],
+    },
+    car_afford: {
+      title: "Car Affordability Check",
+      summary: "Add the loan payment, insurance, gas, and repairs, then see what share of take-home pay the car really takes.",
+      inputs: ["Take-home pay", "Car price", "Down payment", "Loan rate and term", "Insurance, gas, and upkeep"],
+      useCases: ["Avoid a car payment that squeezes your budget", "Compare loan lengths", "See total ownership cost"],
+    },
+    retirement_number: {
+      title: "Retirement Number Calculator",
+      summary: "Estimate the nest egg you need and the monthly amount to save, adjusted for inflation.",
+      inputs: ["Current age", "Retirement age", "Monthly spending in retirement (today's dollars)", "Current savings", "Return and inflation"],
+      useCases: ["Set a savings target", "See what starting early is worth", "Test different retirement ages"],
+    },
     student_loan: {
       title: "Student Loan Payoff Planner",
       summary: "See your standard monthly payment, total interest, and how much time and money extra payments save.",
