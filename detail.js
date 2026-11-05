@@ -893,7 +893,14 @@ const toolRenderers = {
     };
     const SS_WAGE_BASE = 184500;
     const controls = document.querySelector("#tool-page-controls");
+    const stateList = window.STATE_TAX || {};
     controls.innerHTML = `
+      <label>State
+        <select id="p-pay-state-pick">
+          <option value="">Custom rate (use slider)</option>
+          ${Object.keys(stateList).sort((a, b) => stateList[a][0].localeCompare(stateList[b][0])).map((code) => `<option value="${code}">${stateList[code][0]}${stateList[code][1] === 0 ? " (no wage income tax)" : ""}</option>`).join("")}
+        </select>
+      </label>
       <label>Filing status
         <select id="p-pay-status">
           <option value="single">Single</option>
@@ -910,8 +917,24 @@ const toolRenderers = {
       </label>
       ${pageControl("Annual salary", "p-pay-salary", 20000, 250000, 65000, 1000, "$")}
       ${pageControl("Pre-tax 401(k)", "p-pay-401k", 0, 25, 5, 1, "", "%")}
-      ${pageControl("State income tax", "p-pay-state", 0, 10, 4, 0.5, "", "%")}
+      ${pageControl("State income tax (approx.)", "p-pay-state", 0, 10, 4, 0.25, "", "%")}
     `;
+    const pickState = (code, announce) => {
+      const entry = stateList[code];
+      if (!entry) return;
+      const slider = document.querySelector("#p-pay-state");
+      slider.value = entry[1];
+      document.querySelector("#p-pay-state-pick").value = code;
+      if (announce) {
+        document.title = `${entry[0]} Paycheck Calculator | Barone Investment Group`;
+        document.querySelector("#detail-title").textContent = `${entry[0]} Paycheck Calculator`;
+        setPageMeta(document.title, `Estimate your ${entry[0]} take-home pay after federal tax, Social Security, Medicare, state income tax and 401(k). Free, no login.`);
+      }
+    };
+    const urlState = (params.get("state") || "").toUpperCase();
+    if (stateList[urlState]) pickState(urlState, true);
+    document.querySelector("#p-pay-state-pick").addEventListener("change", (e) => { if (e.target.value) pickState(e.target.value, false); });
+    document.querySelector("#p-pay-state").addEventListener("input", () => { document.querySelector("#p-pay-state-pick").value = ""; });
     const fedTax = (taxable, status) => {
       let tax = 0, prev = 0;
       for (const [cap, rate] of FED[status].brackets) {
@@ -1066,6 +1089,13 @@ function renderTool() {
   document.querySelector("#tool-inputs").innerHTML = list(item.inputs);
   document.querySelector("#tool-use-cases").innerHTML = list(item.useCases);
   (toolRenderers[key] || toolRenderers.compound)();
+  const noteEl = document.querySelector("#tool-page-note");
+  if (noteEl && noteEl.parentElement) {
+    const how = document.createElement("p");
+    how.className = "tool-hint";
+    how.innerHTML = 'Educational estimate. <a href="method.html">How this is calculated and where the data comes from</a>.';
+    noteEl.parentElement.appendChild(how);
+  }
   renderRelated(content.tools, key, "tool.html?tool=");
 }
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://www.baroneinvestment.site/</loc></url>
+  <url><loc>https://www.baroneinvestment.site/start.html</loc></url>
+  <url><loc>https://www.baroneinvestment.site/method.html</loc></url>
   <url><loc>https://www.baroneinvestment.site/glossary.html</loc></url>
   <url><loc>https://www.baroneinvestment.site/market-made-of-people/</loc></url>
   <url><loc>https://www.baroneinvestment.site/lesson.html?topic=investing</loc></url>
@@ -35,6 +37,57 @@
   <url><loc>https://www.baroneinvestment.site/tool.html?tool=savings_goal</loc></url>
   <url><loc>https://www.baroneinvestment.site/tool.html?tool=net_worth</loc></url>
   <url><loc>https://www.baroneinvestment.site/tool.html?tool=invest_guide</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=AL</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=AK</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=AZ</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=AR</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=CA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=CO</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=CT</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=DE</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=DC</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=FL</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=GA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=HI</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=ID</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=IL</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=IN</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=IA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=KS</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=KY</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=LA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=ME</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=MD</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=MA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=MI</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=MN</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=MS</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=MO</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=MT</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=NE</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=NV</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=NH</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=NJ</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=NM</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=NY</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=NC</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=ND</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=OH</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=OK</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=OR</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=PA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=RI</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=SC</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=SD</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=TN</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=TX</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=UT</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=VT</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=VA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=WA</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=WV</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=WI</loc></url>
+  <url><loc>https://www.baroneinvestment.site/tool.html?tool=paycheck&amp;state=WY</loc></url>
   <url><loc>https://www.baroneinvestment.site/workflow.html?workflow=budgeting</loc></url>
   <url><loc>https://www.baroneinvestment.site/workflow.html?workflow=networking</loc></url>
   <url><loc>https://www.baroneinvestment.site/workflow.html?workflow=resume</loc></url>
